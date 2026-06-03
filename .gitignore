@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+.pnpm-store
+pnpm-lock.yaml
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Environment variables
+.env.local
+.env.*.local
+
+# Build outputs
+.next
+out
+build
+dist
+.claude
+
+# Testing
+coverage
+.nyc_output
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+drizzle/*.sql
+
+# Logs
+logs
+*.log

@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface text-on-surface;
+  }
+
+  h1 {
+    @apply font-serif text-display-lg font-normal;
+  }
+
+  h2 {
+    @apply font-serif text-headline-md font-normal;
+  }
+
+  h3 {
+    @apply font-serif text-headline-sm font-medium;
+  }
+
+  p {
+    @apply font-sans text-body-md font-normal;
+  }
+
+  a {
+    @apply text-primary hover:text-primary-container transition-colors;
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+}
+
+@layer utilities {
+  .elegant-shadow {
+    box-shadow: 0px 10px 40px rgba(60, 60, 59, 0.04);
+  }
+  .reveal-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal-up.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .asymmetric-item:nth-child(even) {
+    margin-top: 40px;
+  }
+  @media (max-width: 768px) {
+    .asymmetric-item:nth-child(even) {
+      margin-top: 0;
+    }
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-container mx-auto px-gutter;
+  }
+
+  .section {
+    @apply py-section-lg;
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 bg-primary text-on-primary rounded hover:bg-primary-container transition-colors font-sans text-body-md;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 border border-secondary text-secondary rounded hover:bg-surface-container-high transition-colors font-sans text-body-md;
+  }
+
+  .divider {
+    @apply h-px bg-outline-variant my-section-lg;
+  }
+}
