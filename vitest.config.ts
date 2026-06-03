@@ -14,9 +14,6 @@ export default defineConfig({
         'src/__tests__/',
       ],
     },
-    transformMode: {
-      web: [/\.[jt]sx?$/],
-    },
   },
   resolve: {
     alias: {
