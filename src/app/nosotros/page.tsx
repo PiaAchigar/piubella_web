@@ -1,7 +1,5 @@
 import { HeroSection } from '@/components/ui/hero-section'
 
-import { MOCK_SERVICES } from '@/lib/mock-data'
-
 export default function Nosotros() {
   return (
     <div className="flex flex-col gap-0">
