@@ -20,10 +20,10 @@ export default function ContactoPage() {
   }
 
   const channels = [
-    { icon: 'chat', label: 'WhatsApp', value: '+54 9 11 2345 6789', href: 'https://wa.me/yourlink' },
-    { icon: 'photo_camera', label: 'Instagram', value: '@piubella.estetica', href: '#' },
-    { icon: 'social_leaderboard', label: 'Facebook', value: 'Piu Bella Pilates', href: '#' },
-    { icon: 'mail', label: 'Email', value: 'hola@piubella.com', href: 'mailto:hola@piubella.com' },
+    { icon: 'chat', label: 'WhatsApp', value: '+54 9 11 3377 5014', href: 'https://wa.me/00541133775014' },
+    { icon: 'photo_camera', label: 'Instagram', value: '@piubellaesteticapilates', href: 'https://www.instagram.com/piubellaesteticapilates/' },
+    { icon: 'social_leaderboard', label: 'Facebook', value: 'Piu Bella Estetica Pilates', href: 'https://www.facebook.com/piubellaesteticagym' },
+    { icon: 'mail', label: 'Email', value: 'info@piubellaesteticapilates.com.ar', href: 'mailto:info@piubellaesteticapilates.com.ar' },
   ]
 
   return (

@@ -38,20 +38,23 @@ export function Footer() {
 
         {/* Íconos sociales */}
         <div className="flex gap-6">
-          <a href="#" aria-label="Redes sociales" className="text-primary hover:opacity-70 transition-opacity">
-            <span className="material-symbols-outlined">social_leaderboard</span>
+          <a href="https://wa.me/00541133775014" aria-label="Whatsapp" className="text-primary hover:opacity-70 transition-opacity" target='_blank'>
+            <span className="material-symbols-outlined">chat</span>
           </a>
-          <a href="mailto:contacto@piubella.com" aria-label="Email" className="text-primary hover:opacity-70 transition-opacity">
+          <a href="mailto:info@piubellaesteticapilates.com.ar" aria-label="Email" className="text-primary hover:opacity-70 transition-opacity">
             <span className="material-symbols-outlined">mail</span>
           </a>
-          <a href="#" aria-label="Ubicación" className="text-primary hover:opacity-70 transition-opacity">
+          <a href="https://search.google.com/local/writereview?placeid=ChIJzxLidZ2kvJURLNp7zU5f2Is" aria-label="Ubicación" className="text-primary hover:opacity-70 transition-opacity" target='_blank'>
             <span className="material-symbols-outlined">map</span>
           </a>
         </div>
 
         {/* Copyright */}
         <p className="font-sans text-body-md text-on-surface-variant opacity-60">
-          © {year} Piu Bella Estética &amp; Pilates. Todos los derechos reservados.
+          Piu Bella Estética Pilates. Todos los derechos reservados.
+        </p>
+        <p className="font-sans text-on-surface-variant opacity-40">
+          © {year} Complexa IA Software &amp; Automation
         </p>
 
       </div>

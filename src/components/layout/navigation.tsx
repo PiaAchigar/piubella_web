@@ -31,7 +31,7 @@ export function Navigation() {
             alt="Piu Bella logo"
             width={60}
             height={60}
-            className="w-auto h-10 object-contain"
+            className="w-auto object-contain"
             priority
           />
         </Link>

@@ -11,19 +11,27 @@ export default function Nosotros() {
   const instagramPosts = [
     {
       src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA2dQ73j09PZ9UnYGtIxaANMROnZLkXDnoHIibFc26yYBseh7QK9rjix_bJjVjlqwhXkZgVPJS15b7jo0ZAyLvF6V9XBIfi6-OVKOeWBCH9lw8b8mG934nHVJYXX5lBOH-G3dTjbwRS50-AGvKaJ5o1q6YVkqEf2JrsOcCaWCx_t1Dvuxq9QnRFDZz8iPo27eV6-lRk1s94lUj3PwmezOkieYOHttJTGmRJYyCrpD7vENzWQsr1sIcZ8Sw1a3df7NF_rNfEwTfLaWQ8',
-      icon: 'photo_camera',
+      icon: 'group',
+      name:"Facebook",
+      http:"https://www.facebook.com/piubellaesteticagym"
     },
     {
       src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBHTp2nfnP37AJfd_fPpxVNcpjq9U8Imdt1HhiPl9EHtLsnBYZtD-SbPgTjuYMFPeZrrbO88ByUe3qwPHAC6bWZVWdM1jTFlxp5gFL_C92W6cfeHNohJKwDFzjuvdosbSur6yCkPpu2sSiLuWRCWLW_ZIUR2o3xMsoqm3Kg7kil6t1GYnt0Asvs3nHDvkgQwspfC6JoXJTH73EAGPthQw935JQ4EOg6J66zqEr-yA4zWtAC5Jgrf4EaL4SUbpgVEZOgKwcXzsAG7t1-',
-      icon: 'favorite',
+      icon: 'photo_camera',
+      name:"Instagram",
+      http:"https://www.instagram.com/piubellaesteticapilates/"
     },
     {
       src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDkAlUAgEFToMbHxJkxyt7q0N9QbKEmp6O_KVcIsmi2FX80ir2MFfTy78c5fCK61P2kr7DExVj4Xik-Fh1SY8l65vR_KNhgoisVItQ7_mlhXKEQEIlxgjfi63VSylh1qPyC3ZmJPHRZAteWeElvE2lPqAEDl7v5q3wSkW6wSo4YQRFT_2fn86dOmnQ9Sjc0MGBAXcnlbdzA0hJP_ghlIrom__AhG_YY_SGLUJRr2Rk4noFM6CGFs-o4na5JJGGV6Jrqgi8FrNjp8fsw',
-      icon: 'chat_bubble',
+      icon: 'chat',
+      name:"WhatsApp",
+      http:"https://wa.me/00541133775014"
     },
     {
       src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAJPLlIKhBpT2JlaORkKAzf4x95OA0oK8ESkX5y7vvykuUm4fJaiwUVTcEU10j9kR-0NgD9qSitzmp_UXFsaaWc9DyhcGtU7Dy_DW_XEmFqk-HkUli8gyt6gH8bFslxxzLo_P1sSL3uuJBaIERA0_mxsC5W8OV0cIHx0It5Fl3fT7T7JT37HQKRuwW5IZsIJfDhf_tjSPHbCYah2wJiJe8p8xxtI0nLGdUYeGu9h4vLLg5wpjp2ZvrgYnVKKTWdgMSG7VlmnE2wRu3A',
-      icon: 'share',
+      icon: 'map',
+      name:"Google Maps",
+      http:"https://search.google.com/local/writereview?placeid=ChIJzxLidZ2kvJURLNp7zU5f2Is"
     },
   ]
 
@@ -38,6 +46,7 @@ export default function Nosotros() {
           sizes="100vw"
           className="object-cover"
         />
+        <div className="absolute inset-0 bg-gradient-to-r from-surface/80 via-surface/40 to-transparent" />
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 text-center text-white px-gutter max-w-4xl">
           <h1 className="font-serif text-display-lg-mobile md:text-display-lg mb-6">
@@ -93,7 +102,7 @@ export default function Nosotros() {
               </div>
               <div className="absolute -bottom-8 -left-8 hidden md:block w-48 h-48 bg-secondary-container p-6 rounded-lg elegant-shadow">
                 <div className="h-full flex flex-col justify-center items-center text-center border border-white/50">
-                  <span className="font-serif text-headline-md text-primary">15+</span>
+                  <span className="font-serif text-headline-md text-primary">23+</span>
                   <span className="font-sans text-label-md text-on-secondary-container">
                     Años de Excelencia
                   </span>
@@ -138,38 +147,41 @@ export default function Nosotros() {
             <div className="flex justify-between items-end mb-12">
               <div className="max-w-md">
                 <h2 className="font-serif text-headline-md text-on-surface mb-2">
-                  Síguenos en Instagram
+                  Síguenos en Redes
                 </h2>
                 <p className="font-sans text-body-md text-on-surface-variant">
                   Inspírate con nuestro estilo de vida y descubre consejos de bienestar diarios.
                 </p>
               </div>
               <a
-                href="#"
-                className="hidden md:block font-sans text-label-md text-primary tracking-widest uppercase border-b border-primary pb-1 hover:opacity-70 transition-opacity"
+                href="https://www.instagram.com/piubellaesteticapilates/"
+                className="hidden md:block font-sans text-label-md text-primary tracking-widest uppercase border-b border-primary pb-1 hover:opacity-70 transition-opacity" target='_blank'
               >
-                @piubella.estetica
+                @piubellaesteticapilates
               </a>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {instagramPosts.map((post, i) => (
+                <a href={post.http} target='_blank'>
                 <div
                   key={i}
                   className="group relative aspect-square overflow-hidden rounded-xl cursor-pointer"
-                >
-                  <Image
-                    src={post.src}
-                    alt={`Instagram post ${i + 1}`}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-white text-4xl">
+                  >
+                    <Image
+                      src={post.src}
+                      alt={`Instagram post ${i + 1}`}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                  <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center">
+                    <span className="material-symbols-outlined text-white" style={{ fontSize: '38px' }}>
                       {post.icon}
                     </span>
+                    <p className='text-white text-3xl'>{post.name}</p>
                   </div>
                 </div>
+                  </a>
               ))}
             </div>
           </div>
