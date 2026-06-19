@@ -7,14 +7,20 @@ import { Button } from '@/components/ui/button'
 
 interface BookingSummaryProps {
   booking: BookingData
-  onConfirm?: () => void
+  onPayWithMercadoPago: () => void
+  onPayWithWhatsApp: () => void
   onEdit?: () => void
+  isLoading?: boolean
+  error?: string | null
 }
 
 export function BookingSummary({
   booking,
-  onConfirm,
+  onPayWithMercadoPago,
+  onPayWithWhatsApp,
   onEdit,
+  isLoading = false,
+  error,
 }: BookingSummaryProps) {
   return (
     <div className="w-full">
@@ -24,7 +30,7 @@ export function BookingSummary({
 
       <Card className="bg-primary-container border-2 border-primary mb-8">
         <div className="p-8 space-y-6">
-          {/* Service */}
+          {/* Servicio */}
           <div className="flex justify-between items-start pb-4 border-b border-on-primary-container">
             <div>
               <p className="font-sans text-label-md text-on-primary-container-variant font-medium">
@@ -44,7 +50,7 @@ export function BookingSummary({
             </div>
           </div>
 
-          {/* Date & Time */}
+          {/* Fecha y hora */}
           <div className="flex justify-between items-start pb-4 border-b border-on-primary-container">
             <div>
               <p className="font-sans text-label-md text-on-primary-container-variant font-medium">
@@ -59,43 +65,31 @@ export function BookingSummary({
             </div>
           </div>
 
-          {/* Contact Information */}
+          {/* Contacto */}
           <div className="pb-4 border-b border-on-primary-container">
             <p className="font-sans text-label-md text-on-primary-container-variant font-medium mb-3">
               Información de contacto
             </p>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="font-sans text-body-md text-on-primary-container-variant">
-                  Nombre:
-                </span>
-                <span className="font-sans text-body-md text-on-primary-container font-medium">
-                  {booking.contactName}
-                </span>
+                <span className="font-sans text-body-md text-on-primary-container-variant">Nombre:</span>
+                <span className="font-sans text-body-md text-on-primary-container font-medium">{booking.contactName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-sans text-body-md text-on-primary-container-variant">
-                  Email:
-                </span>
-                <span className="font-sans text-body-md text-on-primary-container font-medium">
-                  {booking.contactEmail}
-                </span>
+                <span className="font-sans text-body-md text-on-primary-container-variant">Email:</span>
+                <span className="font-sans text-body-md text-on-primary-container font-medium">{booking.contactEmail}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-sans text-body-md text-on-primary-container-variant">
-                  Teléfono:
-                </span>
-                <span className="font-sans text-body-md text-on-primary-container font-medium">
-                  {booking.contactPhone}
-                </span>
+                <span className="font-sans text-body-md text-on-primary-container-variant">Teléfono:</span>
+                <span className="font-sans text-body-md text-on-primary-container font-medium">{booking.contactPhone}</span>
               </div>
             </div>
           </div>
 
-          {/* Total */}
+          {/* Seña */}
           <div className="flex justify-between items-center pt-4">
             <p className="font-sans text-headline-sm text-on-primary-container font-semibold">
-              Total a pagar:
+              Seña a abonar:
             </p>
             <p className="font-serif text-display-lg text-on-primary-container font-bold">
               ${booking.totalPrice.toFixed(2)}
@@ -104,22 +98,45 @@ export function BookingSummary({
         </div>
       </Card>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <Button
-          variant="outline"
-          onClick={onEdit}
-          className="flex-1"
-        >
-          Modificar
-        </Button>
+      {/* Aviso de expiración */}
+      <p className="font-sans text-label-md text-on-surface-variant text-center mb-6">
+        Tu lugar queda reservado por <strong>1 hora</strong> mientras confirmamos la seña.
+      </p>
+
+      {/* Error */}
+      {error && (
+        <div className="mb-4 p-4 bg-error-container rounded-lg text-center">
+          <p className="font-sans text-body-md text-on-error-container">{error}</p>
+        </div>
+      )}
+
+      {/* Botones de pago */}
+      <div className="flex flex-col gap-3">
         <Button
           variant="primary"
-          onClick={onConfirm}
-          className="flex-1"
+          onClick={onPayWithMercadoPago}
+          disabled={isLoading}
+          className="w-full"
         >
-          Confirmar Reserva
+          {isLoading ? 'Procesando...' : 'Pagar seña con MercadoPago'}
         </Button>
+
+        <Button
+          variant="outline"
+          onClick={onPayWithWhatsApp}
+          disabled={isLoading}
+          className="w-full"
+        >
+          Enviar seña por WhatsApp
+        </Button>
+
+        <button
+          onClick={onEdit}
+          disabled={isLoading}
+          className="w-full text-center font-sans text-label-md text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50"
+        >
+          Modificar reserva
+        </button>
       </div>
     </div>
   )

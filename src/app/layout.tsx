@@ -4,13 +4,17 @@ import { Providers } from '@/providers/query-client-provider'
 import { ErrorBoundary } from '@/components/shared/error-boundary'
 import { Navigation } from '@/components/layout/navigation'
 import { Footer } from '@/components/layout/footer'
+import { WhatsAppFab } from '@/components/ui/whatsapp-fab'
 
 export const metadata: Metadata = {
-  title: 'PiuBella | Belleza y Cuidado Personal',
+  title: 'Piu Bella Estética Pilates| Belleza y Cuidado Personal',
   description:
     'Cuidado integral para tu cuerpo, mente y alma.',
   keywords: ['belleza', 'spa', 'depilación', 'masajes', 'faciales'],
   robots: 'index, follow',
+  icons: {
+    icon: '/logo_marron.png',
+  },
 }
 
 export default function RootLayout({
@@ -36,6 +40,7 @@ export default function RootLayout({
               </main>
               <Footer />
             </div>
+            <WhatsAppFab />
           </Providers>
         </ErrorBoundary>
       </body>

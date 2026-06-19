@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { fetchCompanyConfig, WorkerCompanyConfig } from '@/lib/worker-api'
 
 const LEGAL_LINKS = [
   { label: 'Política de Privacidad', href: '/privacidad' },
@@ -6,8 +7,27 @@ const LEGAL_LINKS = [
   { label: 'Cookies', href: '/cookies' },
 ]
 
-export function Footer() {
+async function getConfig(): Promise<WorkerCompanyConfig | null> {
+  try {
+    return await fetchCompanyConfig()
+  } catch {
+    return null
+  }
+}
+
+export async function Footer() {
+  const config = await getConfig()
   const year = new Date().getFullYear()
+
+  const whatsappHref = config?.whatsapp
+    ? `https://wa.me/${config.whatsapp}`
+    : 'https://wa.me/5491133775014'
+
+  const emailHref = config?.email
+    ? `mailto:${config.email}`
+    : 'mailto:info@piubellaesteticapilates.com.ar'
+
+  const companyName = config?.companyName ?? 'Piu Bella Estética & Pilates'
 
   return (
     <footer className="w-full mt-auto bg-surface-container-highest border-t border-outline-variant/50">
@@ -16,11 +36,16 @@ export function Footer() {
         {/* Logo + nombre + tagline */}
         <div className="flex flex-col items-center gap-4">
           <p className="font-serif text-headline-md text-on-surface">
-            Piu Bella Estética &amp; Pilates
+            {companyName}
           </p>
           <p className="font-sans text-body-md text-on-surface-variant max-w-md text-center">
             Bienestar integral para armonizar tu vida.
           </p>
+          {config?.address && (
+            <p className="font-sans text-label-md text-on-surface-variant">
+              {config.address}
+            </p>
+          )}
         </div>
 
         {/* Links legales */}
@@ -38,13 +63,13 @@ export function Footer() {
 
         {/* Íconos sociales */}
         <div className="flex gap-6">
-          <a href="https://wa.me/00541133775014" aria-label="Whatsapp" className="text-primary hover:opacity-70 transition-opacity" target='_blank'>
+          <a href={whatsappHref} aria-label="Whatsapp" className="text-primary hover:opacity-70 transition-opacity" target="_blank">
             <span className="material-symbols-outlined">chat</span>
           </a>
-          <a href="mailto:info@piubellaesteticapilates.com.ar" aria-label="Email" className="text-primary hover:opacity-70 transition-opacity">
+          <a href={emailHref} aria-label="Email" className="text-primary hover:opacity-70 transition-opacity">
             <span className="material-symbols-outlined">mail</span>
           </a>
-          <a href="https://search.google.com/local/writereview?placeid=ChIJzxLidZ2kvJURLNp7zU5f2Is" aria-label="Ubicación" className="text-primary hover:opacity-70 transition-opacity" target='_blank'>
+          <a href="https://search.google.com/local/writereview?placeid=ChIJzxLidZ2kvJURLNp7zU5f2Is" aria-label="Ubicación" className="text-primary hover:opacity-70 transition-opacity" target="_blank">
             <span className="material-symbols-outlined">map</span>
           </a>
         </div>

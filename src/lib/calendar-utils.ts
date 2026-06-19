@@ -1,5 +1,4 @@
 import { TimeSlot } from '@/types'
-import { MOCK_TIME_SLOTS } from './mock-data'
 
 export function isPastDate(date: Date): boolean {
   const today = new Date()
@@ -40,10 +39,40 @@ export function validatePhone(phone: string): boolean {
   return digitsOnly.length >= 10 && digitsOnly.length <= 15
 }
 
-export function getAvailableSlots(_date: Date, _serviceId?: string): TimeSlot[] {
-  // For now, return all available slots from mock data
-  // In FASE 4, this will query Supabase based on provider availability
-  return MOCK_TIME_SLOTS.filter((slot) => slot.available === true)
+// Genera slots de 30 minutos entre dos horarios HH:MM
+export function generateTimeSlots(openTime: string, closeTime: string, intervalMinutes = 30): string[] {
+  const [openH, openM] = openTime.split(':').map(Number)
+  const [closeH, closeM] = closeTime.split(':').map(Number)
+
+  const slots: string[] = []
+  let current = openH * 60 + openM
+  const end = closeH * 60 + closeM
+
+  while (current < end) {
+    const h = Math.floor(current / 60)
+    const m = current % 60
+    slots.push(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`)
+    current += intervalMinutes
+  }
+
+  return slots
+}
+
+export function buildWhatsAppUrl(phone: string, message: string): string {
+  const clean = phone.replace(/\D/g, '')
+  return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`
+}
+
+export function formatDateISO(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+// Kept for backward compatibility — callers migrated to useAvailability hook
+export function getAvailableSlots(_date: Date): TimeSlot[] {
+  return []
 }
 
 export function getNextAvailableDate(): Date {

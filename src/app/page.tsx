@@ -1,32 +1,8 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect } from 'react'
-
-const SERVICES = [
-  {
-    id: 1,
-    title: 'Pilates Reformer',
-    description: 'Fortalece tu centro, mejora tu postura y gana flexibilidad con clases personalizadas.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBW_7FamrsJUlVqgGKfu_1rewRiZ6AHb8smyI4CDnBft6Wd9eqnAdq_M6uPyM55ZNXJLNMJR8mlOP4T4qXsA54CiN_-W2DMcPCBxV6ShH4kTjC6p7CywotT_Z-lP9p-1Zw3b5uzQuKKijsNTwi0VAtf7mY_E-fhHzcSKYhw_OrTLO755RJhKPj3sxaxcKGQMCRUqPR7F1zRQmv33DNZ8a5BAqqm_QqzTNqhkTcyNtIGv0A_45hKOFqEdo31_ZD0bTafcPi7mbnth5oC',
-  },
-  {
-    id: 2,
-    title: 'Estética Avanzada',
-    description: 'Tratamientos faciales y corporales que realzan tu belleza natural con ciencia y arte.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAjp_uB2T-Ea6pXbw93dT6kxsYFn9f3A0C_2kzfXcSjgzpcVAWiqOKTeXLpBqqrXnUNdhRHaP5RP7OpCd4qsag7XuSgZFhSrwG0Vtb4GqHws8CPCnQx6W7AnsOiE_8t1N6GkgsHB6XFKv5AW1UkAvyrz1Yz2vqkDZC-RAQ9_9iA-uZM2XkO2GPh2Bp5j_PVb9B512tjyowKI2dk9851wa-0x9BOB6n_xzdcEnzFCXsoAVR6nzKRFAX0bIbQPnj9WWY_yYeoQ7BGTcf1',
-  },
-  {
-    id: 3,
-    title: 'Masajes & Spa',
-    description: 'Libera tensiones y reconecta con tu paz interior a través de nuestras terapias manuales.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBiSlKrXvBfd4gsHcv4JAhEq8VPM37_kwcNwlOCUUg7nvIaQ9XCs-n459cfB3RsS_uo9l85awf9z6hMcZGoAj35dNZ5E0voot55YimMqOWmF_uni7gBE3cHkbSaX5WxwgUKhQ9XnXolJtcjfngX5unCqjU_hRVLGtFxUljTVsOWAyiYdPyzXkjw5VaKahh0BibdRNQP1iDW_iEI-dhd6KZXZVhGaoAspXbM7OXnn_ylbyIDu8ZTKwgu8tFL1MSd7RLPTetlZZ549cDd',
-  },
-]
+import { RevealObserver } from '@/components/ui/reveal-observer'
+import { fetchServices } from '@/lib/worker-api'
+import { Service } from '@/types'
 
 const NOSOTROS_IMG_1 =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCpvQE7n_ihNG9PSVU5xhch2Q88-og7-yOKkScggtZ8toZR8Py1fEUUIGw4EaazAaBWK88PxZ8G_R519MVhx_U88nYXW5lMBctDxrjaVmtjZJYGpEUyS6vnIqmAasi9lLqOJYR_R3dIXhBEueacPUkBvh-NeSWGUXjAGSHZ8PfzvqA3Z0ps_a9VNqF1Nsj5Izp-Fh-yvE_IrQNIsuSiwEuvXNfHGeP_ILiueYsq2XnkgFoAA-U4ZsdqbiN_AfU0E2yfBrNUb3HBHS16'
@@ -35,18 +11,22 @@ const NOSOTROS_IMG_2 =
 const TESTIMONIAL_AVATAR =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBYBZVjQK9PmhvNphQliDEme6jW1EdSZGLwyFliHo2_YspPIrIDZrLet61utyM4YiUOpkF-c4DPcVXUo5zTwoubQecWU_ZBRi7_TV8j-bFphMjRq6vtR_bCuXXF1YR8BrMJystGWtAkt22n4gai_uihAK_sEeSEOsL1ZM0ya8ASCE50HojY1jnVFESfZApP0oVBqFci0hno3ndlktYaTR60J00d2rBcA7LxIgCledygxdk2EB2rAXQAcq_z62DNSw7o5_h5g2_56U0X'
 
-export default function Home() {
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add('active')),
-      { threshold: 0.1 }
-    )
-    document.querySelectorAll('.reveal-up').forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
-  }, [])
+async function getFeaturedServices(): Promise<Service[]> {
+  try {
+    const all = await fetchServices()
+    return all.slice(0, 3)
+  } catch {
+    return []
+  }
+}
+
+export default async function Home() {
+  const featuredServices = await getFeaturedServices()
 
   return (
     <div className="flex flex-col gap-0">
+      <RevealObserver />
+
       {/* Hero Section */}
       <header className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -152,26 +132,24 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {SERVICES.map((service) => (
+            {featuredServices.map((service: Service) => (
               <div key={service.id} className="asymmetric-item group reveal-up">
-                <div className="bg-surface rounded-xl overflow-hidden elegant-shadow transition-transform duration-500 hover:-translate-y-2">
-                  <div className="aspect-[3/4] overflow-hidden relative">
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-8">
+                <div className="bg-surface rounded-xl overflow-hidden elegant-shadow transition-transform duration-500 hover:-translate-y-2 h-full flex flex-col">
+                  <div className="p-8 flex flex-col flex-grow">
                     <h3 className="font-serif text-headline-sm text-on-surface mb-3 font-medium">
-                      {service.title}
+                      {service.name}
                     </h3>
-                    <p className="font-sans text-body-md text-on-surface-variant mb-6">
-                      {service.description}
+                    <p className="font-sans text-body-md text-on-surface-variant mb-6 flex-grow">
+                      {service.description ?? ''}
                     </p>
-                    <span className="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform inline-block">
-                      arrow_forward
-                    </span>
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/30">
+                      <span className="font-sans text-label-md text-on-surface-variant">
+                        {service.duration_minutes} min
+                      </span>
+                      <span className="font-sans text-label-md text-primary font-bold">
+                        ${Number(service.unit_price).toLocaleString('es-AR')}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -193,9 +171,6 @@ export default function Home() {
       <section className="py-section-lg bg-surface relative">
         <div className="container text-center">
           <div className="max-w-3xl mx-auto reveal-up">
-            <span className="material-symbols-outlined text-primary-container text-4xl mb-6 block">
-              format_quote
-            </span>
             <p className="font-serif italic text-headline-md md:text-display-lg text-primary mb-12 font-normal">
               &ldquo;Piu Bella no es solo un centro de estética, es mi momento de pausa y reconexión
               diaria. El ambiente es simplemente mágico.&rdquo;

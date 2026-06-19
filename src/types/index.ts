@@ -1,4 +1,11 @@
 // Database types
+export interface Category {
+  id: string
+  name: string
+  parent_category_id: string | null
+  created_at: Date
+}
+
 export interface Service {
   id: string
   name: string
@@ -29,6 +36,8 @@ export interface ProviderAvailability {
   updated_at: Date
 }
 
+export type AppointmentStatus = 'reserved' | 'scheduled' | 'completed' | 'canceled' | 'no_show'
+
 export interface Appointment {
   id: string
   service_id: string
@@ -38,7 +47,8 @@ export interface Appointment {
   customer_phone: string
   appointment_date: string
   appointment_time: string
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+  status: AppointmentStatus
+  expires_at: Date | null
   notes: string | null
   created_at: Date
   updated_at: Date
@@ -99,10 +109,9 @@ export interface BookingData extends BookingFormData {
   totalPrice: number
 }
 
-// Request/Response types
+// Request/Response types — provider_id es asignado automáticamente por el servidor
 export interface CreateAppointmentInput {
   service_id: string
-  provider_id: string
   customer_name: string
   customer_email: string
   customer_phone: string

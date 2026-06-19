@@ -2,6 +2,13 @@ import { pgTable, uuid, varchar, serial, timestamp, text, boolean, decimal, chec
 import { relations, sql } from 'drizzle-orm'
 
 // SERVICES & TRAINING Schema
+export const categories = pgTable('categories', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 100 }).notNull(),
+  parent_category_id: uuid('parent_category_id'),
+  created_at: timestamp('created_at').defaultNow(),
+})
+
 export const services = pgTable(
   'services',
   {
@@ -17,6 +24,12 @@ export const services = pgTable(
     priceCheck: check('services_unit_price_positive', sql`${table.unit_price} >= 0`),
   }),
 )
+
+export const serviceCategory = pgTable('service_category', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  service_id: uuid('service_id').notNull().references(() => services.id),
+  category_id: uuid('category_id').notNull().references(() => categories.id),
+})
 
 export const serviceProviders = pgTable('service_providers', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -53,8 +66,14 @@ export const appointments = pgTable(
     customer_email: varchar('customer_email', { length: 100 }).notNull(),
     customer_phone: varchar('customer_phone', { length: 20 }).notNull(),
     appointment_date: varchar('appointment_date', { length: 10 }).notNull(), // YYYY-MM-DD
-    appointment_time: varchar('appointment_time', { length: 5 }).notNull(), // HH:MM
-    status: varchar('status', { length: 20 }).notNull().default('pending'), // pending, confirmed, completed, cancelled
+    appointment_time: varchar('appointment_time', { length: 5 }).notNull(),  // HH:MM
+    // reserved: esperando seña (expira en 1h)
+    // scheduled: seña confirmada
+    // completed: el cliente vino
+    // canceled: cancelado (manual o automático por timeout)
+    // no_show: tenía scheduled pero no vino
+    status: varchar('status', { length: 20 }).notNull().default('reserved'),
+    expires_at: timestamp('expires_at'), // solo para status='reserved', NULL en los demás
     notes: text('notes'),
     created_at: timestamp('created_at').defaultNow(),
     updated_at: timestamp('updated_at').defaultNow(),
@@ -62,7 +81,7 @@ export const appointments = pgTable(
   (table) => ({
     statusCheck: check(
       'appointments_status_valid',
-      sql`${table.status} IN ('pending', 'confirmed', 'completed', 'cancelled')`,
+      sql`${table.status} IN ('reserved', 'scheduled', 'completed', 'canceled', 'no_show')`,
     ),
   }),
 )
@@ -91,27 +110,42 @@ export const openHours = pgTable('open_hours', {
 })
 
 // Relations
+export const categoriesRelations = relations(categories, ({ many, one }) => ({
+  services: many(serviceCategory),
+  parent: one(categories, {
+    fields: [categories.parent_category_id],
+    references: [categories.id],
+  }),
+  children: many(categories),
+}))
+
 export const servicesRelations = relations(services, ({ many }) => ({
+  appointments: many(appointments),
+  categories: many(serviceCategory),
+}))
+
+export const serviceCategoryRelations = relations(serviceCategory, ({ one }) => ({
+  service: one(services, {
+    fields: [serviceCategory.service_id],
+    references: [services.id],
+  }),
+  category: one(categories, {
+    fields: [serviceCategory.category_id],
+    references: [categories.id],
+  }),
+}))
+
+export const serviceProvidersRelations = relations(serviceProviders, ({ many }) => ({
+  availability: many(providerAvailability),
   appointments: many(appointments),
 }))
 
-export const serviceProvidersRelations = relations(
-  serviceProviders,
-  ({ many }) => ({
-    availability: many(providerAvailability),
-    appointments: many(appointments),
+export const providerAvailabilityRelations = relations(providerAvailability, ({ one }) => ({
+  provider: one(serviceProviders, {
+    fields: [providerAvailability.provider_id],
+    references: [serviceProviders.id],
   }),
-)
-
-export const providerAvailabilityRelations = relations(
-  providerAvailability,
-  ({ one }) => ({
-    provider: one(serviceProviders, {
-      fields: [providerAvailability.provider_id],
-      references: [serviceProviders.id],
-    }),
-  }),
-)
+}))
 
 export const appointmentsRelations = relations(appointments, ({ one }) => ({
   service: one(services, {
