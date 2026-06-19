@@ -131,3 +131,33 @@ export async function fetchCompanyConfig(): Promise<WorkerCompanyConfig> {
     next: { revalidate: 3600 },
   })) as WorkerCompanyConfig
 }
+
+// ─── Promotions ───────────────────────────────────────────────────────────────
+
+export interface WorkerPromotionService {
+  id: string
+  name: string | null
+  unitPriceList: number | null
+  unitPriceCash: number | null
+  estimatedDurationMinutes: number | null
+}
+
+export interface WorkerPromotion {
+  id: string
+  name: string | null
+  description: string | null
+  promotionType: string | null
+  discountPercentage: number | null
+  discountAmount: number | null
+  validFrom: string | null
+  validUntil: string | null
+  services: WorkerPromotionService[]
+}
+
+export async function fetchPromotions(
+  fetchOptions?: { revalidate?: number },
+): Promise<WorkerPromotion[]> {
+  return (await workerGet('/api/agenda/promotions', {
+    next: { revalidate: fetchOptions?.revalidate ?? 1800 },
+  })) as WorkerPromotion[]
+}

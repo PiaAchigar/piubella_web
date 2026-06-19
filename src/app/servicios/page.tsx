@@ -2,6 +2,7 @@ import { fetchCategoryTree, fetchServices, WorkerCategory } from '@/lib/worker-a
 import { Service } from '@/types'
 import { CategoryNode } from '@/components/servicios/types'
 import { ServiciosClient } from '@/components/servicios/servicios-client'
+import { PromosHero } from '@/components/servicios/promos-hero'
 
 // Construye el nodo recursivamente: fetcha servicios propios + recursa en hijos
 async function buildNode(cat: WorkerCategory): Promise<CategoryNode> {
@@ -50,5 +51,10 @@ function flattenUnique(nodes: CategoryNode[]): Service[] {
 export default async function Servicios() {
   const tree = await getCategoryTree()
   const allServices = flattenUnique(tree)
-  return <ServiciosClient tree={tree} allServices={allServices} />
+  return (
+    <>
+      <PromosHero />
+      <ServiciosClient tree={tree} allServices={allServices} />
+    </>
+  )
 }
