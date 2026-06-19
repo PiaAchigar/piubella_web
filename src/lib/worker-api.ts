@@ -16,8 +16,8 @@ export interface WorkerService {
   name: string
   description: string | null
   code: string | null
-  unitPriceList: number
-  unitPriceCash: number
+  unitPriceList: number | null
+  unitPriceCash: number | null
   taxCategory: string
   requiresOperator: boolean
   requiresMachine: boolean
@@ -69,8 +69,8 @@ export function mapService(s: WorkerService): Service {
     id: s.id,
     name: s.name,
     description: s.description,
-    unit_price: String(s.unitPriceList),
-    duration_minutes: s.estimatedDurationMinutes,
+    unit_price: s.unitPriceList != null ? String(s.unitPriceList) : '',
+    duration_minutes: s.estimatedDurationMinutes ?? 0,
     created_at: new Date(0),
     updated_at: new Date(0),
   }
@@ -87,12 +87,18 @@ export function mapAvailabilitySlots(availability: WorkerAvailability): TimeSlot
 
 // ─── Fetchers tipados ─────────────────────────────────────────────────────────
 
+export async function fetchCategoryTree(
+  fetchOptions?: { revalidate?: number },
+): Promise<WorkerCategory[]> {
+  return (await workerGet('/api/agenda/categories', {
+    next: { revalidate: fetchOptions?.revalidate ?? 3600 },
+  })) as WorkerCategory[]
+}
+
 export async function fetchCategories(
   fetchOptions?: { revalidate?: number },
 ): Promise<{ id: string; name: string }[]> {
-  const raw = (await workerGet('/api/agenda/categories', {
-    next: { revalidate: fetchOptions?.revalidate ?? 3600 },
-  })) as WorkerCategory[]
+  const raw = await fetchCategoryTree(fetchOptions)
   return flattenCategories(raw)
 }
 
