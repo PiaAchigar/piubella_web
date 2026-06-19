@@ -1,61 +1,90 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { CategoryNode } from './types'
 
-interface SidebarSection {
-  id: string
-  name: string
-  subcategories: { id: string; name: string }[]
+interface NavItemProps {
+  node: CategoryNode
+  depth: number
+  openIds: Set<string>
+  toggle: (id: string) => void
 }
 
-export function SidebarNav({ sections }: { sections: SidebarSection[] }) {
-  const [openId, setOpenId] = useState<string | null>(null)
-
-  const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id))
+function NavItem({ node, depth, openIds, toggle }: NavItemProps) {
+  const isOpen = openIds.has(node.id)
+  const hasSubs = node.children.length > 0
+  const indent = depth * 14
 
   return (
-    <nav className="flex flex-col space-y-1 overflow-y-auto">
-      {sections.map((section) => {
-        const isOpen = openId === section.id
-        const hasSubs = section.subcategories.length > 0
+    <div>
+      <div
+        className="flex items-center gap-1 my-0.5 mx-2 rounded-lg hover:bg-surface-variant/50 transition-all"
+        style={{ paddingLeft: `${8 + indent}px` }}
+      >
+        {depth === 0 && (
+          <span className="material-symbols-outlined text-outline text-base flex-shrink-0">spa</span>
+        )}
+        {depth > 0 && (
+          <span className="w-1 h-1 rounded-full bg-outline/50 flex-shrink-0" />
+        )}
 
-        return (
-          <div key={section.id}>
-            <button
-              onClick={() => toggle(section.id)}
-              className="w-full p-3 mx-2 my-1 flex items-center gap-3 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-all text-left"
-              style={{ width: 'calc(100% - 1rem)' }}
+        <a
+          href={`#cat-${node.id}`}
+          className={`flex-1 py-2 text-on-surface-variant hover:text-primary transition-colors ${
+            depth === 0 ? 'font-sans text-label-md' : 'font-sans text-body-sm'
+          }`}
+        >
+          {node.name}
+        </a>
+
+        {hasSubs && (
+          <button
+            onClick={() => toggle(node.id)}
+            className="p-1 text-outline hover:text-primary transition-colors flex-shrink-0"
+            aria-label={isOpen ? 'Colapsar' : 'Expandir'}
+          >
+            <span
+              className="material-symbols-outlined text-sm block transition-transform duration-200"
+              style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
             >
-              <span className="material-symbols-outlined text-outline flex-shrink-0">spa</span>
-              <span className="font-sans text-label-md flex-1">{section.name}</span>
-              {hasSubs && (
-                <span
-                  className="material-symbols-outlined text-outline text-sm transition-transform duration-200"
-                  style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                >
-                  expand_more
-                </span>
-              )}
-            </button>
+              expand_more
+            </span>
+          </button>
+        )}
+      </div>
 
-            {hasSubs && isOpen && (
-              <div className="ml-6 mb-1 flex flex-col space-y-1">
-                {section.subcategories.map((sub) => (
-                  <a
-                    key={sub.id}
-                    href={`#sub-${sub.id}`}
-                    className="p-2 mx-2 flex items-center gap-2 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-all"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-primary flex-shrink-0" />
-                    <span className="font-sans text-label-md">{sub.name}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        )
-      })}
+      {hasSubs && isOpen && (
+        <div>
+          {node.children.map((child) => (
+            <NavItem
+              key={child.id}
+              node={child}
+              depth={depth + 1}
+              openIds={openIds}
+              toggle={toggle}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function SidebarNav({ tree }: { tree: CategoryNode[] }) {
+  const [openIds, setOpenIds] = useState<Set<string>>(new Set())
+
+  const toggle = (id: string) =>
+    setOpenIds((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+
+  return (
+    <nav className="flex flex-col overflow-y-auto">
+      {tree.map((node) => (
+        <NavItem key={node.id} node={node} depth={0} openIds={openIds} toggle={toggle} />
+      ))}
     </nav>
   )
 }
