@@ -8,9 +8,10 @@ interface NavItemProps {
   depth: number
   openIds: Set<string>
   toggle: (id: string) => void
+  onLinkClick?: () => void
 }
 
-function NavItem({ node, depth, openIds, toggle }: NavItemProps) {
+function NavItem({ node, depth, openIds, toggle, onLinkClick }: NavItemProps) {
   const isOpen = openIds.has(node.id)
   const hasSubs = node.children.length > 0
   const indent = depth * 14
@@ -30,8 +31,9 @@ function NavItem({ node, depth, openIds, toggle }: NavItemProps) {
 
         <a
           href={`#cat-${node.id}`}
+          onClick={onLinkClick}
           className={`flex-1 py-2 text-on-surface-variant hover:text-primary transition-colors ${
-            depth === 0 ? 'font-sans text-label-md' : 'font-sans text-body-sm'
+            depth === 0 ? 'font-sans text-label-sm' : 'font-sans text-body-md'
           }`}
         >
           {node.name}
@@ -62,6 +64,7 @@ function NavItem({ node, depth, openIds, toggle }: NavItemProps) {
               depth={depth + 1}
               openIds={openIds}
               toggle={toggle}
+              onLinkClick={onLinkClick}
             />
           ))}
         </div>
@@ -70,7 +73,13 @@ function NavItem({ node, depth, openIds, toggle }: NavItemProps) {
   )
 }
 
-export function SidebarNav({ tree }: { tree: CategoryNode[] }) {
+export function SidebarNav({
+  tree,
+  onLinkClick,
+}: {
+  tree: CategoryNode[]
+  onLinkClick?: () => void
+}) {
   const [openIds, setOpenIds] = useState<Set<string>>(new Set())
 
   const toggle = (id: string) =>
@@ -81,9 +90,16 @@ export function SidebarNav({ tree }: { tree: CategoryNode[] }) {
     })
 
   return (
-    <nav className="flex flex-col overflow-y-auto">
+    <nav className="flex flex-col">
       {tree.map((node) => (
-        <NavItem key={node.id} node={node} depth={0} openIds={openIds} toggle={toggle} />
+        <NavItem
+          key={node.id}
+          node={node}
+          depth={0}
+          openIds={openIds}
+          toggle={toggle}
+          onLinkClick={onLinkClick}
+        />
       ))}
     </nav>
   )

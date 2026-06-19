@@ -9,7 +9,7 @@ export function ServiceCard({ service }: { service: Service }) {
     <div className="bg-surface-container-lowest p-8 rounded-xl elegant-shadow border border-surface-container hover:border-primary/20 transition-all flex flex-col">
       <h5 className="font-serif text-headline-sm mb-3 text-on-surface">{service.name}</h5>
       {service.description && (
-        <p className="font-sans text-body-md text-on-surface-variant leading-relaxed mb-6 flex-grow">
+        <p className="font-sans text-body-md text-on-surface-variant leading-relaxed mb-6 flex-grow break-words">
           {service.description}
         </p>
       )}

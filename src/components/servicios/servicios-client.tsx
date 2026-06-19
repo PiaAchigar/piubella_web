@@ -58,6 +58,9 @@ function CategorySection({ node, depth }: { node: CategoryNode; depth: number })
 export function ServiciosClient({ tree, allServices }: Props) {
   const [query, setQuery] = useState('')
   const [showAll, setShowAll] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  const closeDrawer = () => setDrawerOpen(false)
 
   const isSearching = query.trim().length > 0
   const showFlat = showAll || isSearching
@@ -77,14 +80,14 @@ export function ServiciosClient({ tree, allServices }: Props) {
 
       {/* Sidebar */}
       <aside className="hidden md:block w-64 flex-shrink-0">
-        <div className="sticky top-[100px] h-[calc(100vh-120px)] flex flex-col py-8 gap-4 bg-surface-container-low rounded-r-xl elegant-shadow">
-          <div className="px-6">
+        <div className="sticky top-[100px] h-[calc(100vh-120px)] flex flex-col py-8 bg-surface-container-low rounded-r-xl elegant-shadow">
+          <div className="px-6 mb-4">
             <h2 className="font-serif text-headline-sm text-primary">Servicios</h2>
             <p className="font-sans text-label-md text-on-surface-variant">Bienestar Integral</p>
           </div>
 
           {/* Buscador */}
-          <div className="px-4">
+          <div className="px-4 mb-3">
             <div className="flex items-center gap-2 bg-surface rounded-lg px-3 py-2 border border-outline-variant/40 focus-within:border-primary transition-colors">
               <span className="material-symbols-outlined text-on-surface-variant text-base">search</span>
               <input
@@ -106,7 +109,7 @@ export function ServiciosClient({ tree, allServices }: Props) {
           </div>
 
           {/* Botón "Todos los servicios" */}
-          <div className="px-4">
+          <div className="px-4 mb-2">
             <button
               onClick={() => { setShowAll(!showAll); setQuery('') }}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg font-sans text-label-md transition-all ${
@@ -123,8 +126,12 @@ export function ServiciosClient({ tree, allServices }: Props) {
           {/* Nav por categorías — solo en modo categorías */}
           {!showFlat && (
             <>
-              <div className="h-px bg-outline-variant/30 mx-4" />
-              <SidebarNav tree={tree} />
+              {/* Divisor fijo — h-0.5 = 2px de alto */}
+              <div className="h-0.5 bg-outline-variant/30 mx-4 flex-shrink-0" />
+              {/* Área scrolleable — flex-1 + min-h-0 para que el flex no rompa el scroll */}
+              <div className="flex-1 min-h-0 overflow-y-auto sidebar-scroll">
+                <SidebarNav tree={tree} />
+              </div>
             </>
           )}
 
@@ -198,6 +205,96 @@ export function ServiciosClient({ tree, allServices }: Props) {
           </div>
         )}
       </section>
+
+      {/* ── MOBILE: FAB + Bottom Drawer ─────────────────────────────── */}
+      <div className="md:hidden">
+
+        {/* FAB — abre el drawer */}
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="fixed bottom-6 left-6 z-40 flex items-center gap-2 bg-surface-container-highest text-on-surface px-4 py-3 rounded-full shadow-lg border border-outline-variant/30 font-sans text-label-md hover:bg-primary hover:text-on-primary hover:border-primary transition-all duration-300"
+          aria-label="Abrir filtros"
+        >
+          <span className="material-symbols-outlined text-base">tune</span>
+          Filtros
+        </button>
+
+        {/* Backdrop */}
+        <div
+          className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 ${
+            drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={closeDrawer}
+          aria-hidden="true"
+        />
+
+        {/* Drawer */}
+        <div
+          className={`fixed bottom-0 left-0 right-0 z-50 bg-surface rounded-t-2xl shadow-2xl transition-transform duration-300 ease-out ${
+            drawerOpen ? 'translate-y-0' : 'translate-y-full'
+          }`}
+          style={{ maxHeight: '82vh' }}
+        >
+          {/* Handle + header */}
+          <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b border-outline-variant/20 flex-shrink-0">
+            <div className="w-10 h-1 rounded-full bg-outline-variant absolute top-3 left-1/2 -translate-x-1/2" />
+            <p className="font-serif text-headline-sm text-on-surface mt-2">Servicios</p>
+            <button
+              onClick={closeDrawer}
+              className="text-on-surface-variant hover:text-primary transition-colors"
+              aria-label="Cerrar"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          {/* Contenido scrolleable del drawer */}
+          <div className="overflow-y-auto sidebar-scroll flex flex-col gap-3 p-4" style={{ maxHeight: 'calc(82vh - 64px)' }}>
+
+            {/* Buscador */}
+            <div className="flex items-center gap-2 bg-surface-container-low rounded-lg px-3 py-3 border border-outline-variant/40 focus-within:border-primary transition-colors">
+              <span className="material-symbols-outlined text-on-surface-variant text-base">search</span>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value)
+                  if (e.target.value.trim()) setShowAll(false)
+                }}
+                placeholder="Buscar servicio..."
+                className="bg-transparent font-sans text-body-md text-on-surface placeholder:text-on-surface-variant outline-none w-full"
+              />
+              {query && (
+                <button onClick={() => setQuery('')} className="text-on-surface-variant hover:text-primary transition-colors">
+                  <span className="material-symbols-outlined text-base">close</span>
+                </button>
+              )}
+            </div>
+
+            {/* Botón "Todos" */}
+            <button
+              onClick={() => { setShowAll(!showAll); setQuery(''); closeDrawer() }}
+              className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg font-sans text-label-md transition-all ${
+                showAll && !query.trim()
+                  ? 'bg-primary text-on-primary'
+                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
+              }`}
+            >
+              <span className="material-symbols-outlined text-base">apps</span>
+              Todos los servicios
+            </button>
+
+            {/* Divisor */}
+            <div className="h-0.5 bg-outline-variant/30 mx-1" />
+
+            {/* Nav de categorías */}
+            <SidebarNav tree={tree} onLinkClick={closeDrawer} />
+
+            {/* Espacio al final para que no quede pegado al borde */}
+            <div className="h-4" />
+          </div>
+        </div>
+      </div>
     </main>
   )
 }

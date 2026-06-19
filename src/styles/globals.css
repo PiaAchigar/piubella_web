@@ -79,4 +79,28 @@
   .divider {
     @apply h-px bg-outline-variant my-section-lg;
   }
+
+  /* Scrollbar del panel lateral de servicios */
+  .sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #A16D47 transparent;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background-color: #A16D47;
+    border-radius: 9999px;
+  }
+
+  /* Oculta las flechas de los extremos del scroll */
+  .sidebar-scroll::-webkit-scrollbar-button {
+    display: none;
+  }
 }
