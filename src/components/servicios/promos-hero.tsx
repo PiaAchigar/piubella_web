@@ -5,6 +5,7 @@ export async function PromosHero() {
   let promos = []
   try {
     promos = await fetchPromotions()
+    console.log(promos)
   } catch {
     return null
   }
@@ -13,9 +14,9 @@ export async function PromosHero() {
 
   return (
     <section className="bg-primary overflow-hidden">
-      <div className="container py-section-lg">
+      <div className="max-w-[1400px] mx-auto px-gutter py-section-md">
         <div className="mb-10">
-          <span className="font-sans text-label-md text-on-primary/60 tracking-widest uppercase block mb-3">
+          <span className="mt-10 font-sans text-label-md text-on-primary/60 tracking-widest uppercase block">
             Ofertas especiales
           </span>
           <h2 className="font-serif text-display-lg-mobile md:text-display-lg text-on-primary font-normal">
