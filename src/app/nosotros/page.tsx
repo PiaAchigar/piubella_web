@@ -118,7 +118,7 @@ export default function Nosotros() {
           </div>
         </div>
 
-        <section className="py-section-lg bg-surface-container-low">
+        {/* <section className="py-section-lg bg-surface-container-low">
           <div className="max-w-container mx-auto px-gutter text-center">
             <span className="font-sans text-label-md tracking-widest text-primary uppercase mb-12 block">
               Marcas que Confían en Nosotros
@@ -140,7 +140,7 @@ export default function Nosotros() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         <section className="py-section-lg">
           <div className="max-w-container mx-auto px-gutter">
