@@ -103,12 +103,13 @@ export async function fetchCategories(
 }
 
 export async function fetchServices(
-  params?: { categoryId?: string; q?: string },
+  params?: { categoryId?: string; q?: string; featured?: boolean },
   fetchOptions?: { revalidate?: number },
 ): Promise<Service[]> {
   const qs = new URLSearchParams()
   if (params?.categoryId) qs.set('categoryId', params.categoryId)
   if (params?.q) qs.set('q', params.q)
+  if (params?.featured) qs.set('featured', 'true')
   const path = `/api/agenda/services${qs.toString() ? `?${qs}` : ''}`
   const raw = (await workerGet(path, {
     next: { revalidate: fetchOptions?.revalidate ?? 3600 },
@@ -155,9 +156,11 @@ export interface WorkerPromotion {
 }
 
 export async function fetchPromotions(
+  params?: { featured?: boolean },
   fetchOptions?: { revalidate?: number },
 ): Promise<WorkerPromotion[]> {
-  return (await workerGet('/api/agenda/promotions', {
+  const qs = params?.featured ? '?featured=true' : ''
+  return (await workerGet(`/api/agenda/promotions${qs}`, {
     next: { revalidate: fetchOptions?.revalidate ?? 1800 },
   })) as WorkerPromotion[]
 }

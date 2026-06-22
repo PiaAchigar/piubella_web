@@ -1,8 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { RevealObserver } from '@/components/ui/reveal-observer'
-import { fetchServices } from '@/lib/worker-api'
+import { fetchServices, fetchPromotions, WorkerPromotion } from '@/lib/worker-api'
 import { Service } from '@/types'
+import { PromoCarousel } from '@/components/servicios/promo-carousel'
 
 const NOSOTROS_IMG_1 =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCpvQE7n_ihNG9PSVU5xhch2Q88-og7-yOKkScggtZ8toZR8Py1fEUUIGw4EaazAaBWK88PxZ8G_R519MVhx_U88nYXW5lMBctDxrjaVmtjZJYGpEUyS6vnIqmAasi9lLqOJYR_R3dIXhBEueacPUkBvh-NeSWGUXjAGSHZ8PfzvqA3Z0ps_a9VNqF1Nsj5Izp-Fh-yvE_IrQNIsuSiwEuvXNfHGeP_ILiueYsq2XnkgFoAA-U4ZsdqbiN_AfU0E2yfBrNUb3HBHS16'
@@ -13,15 +14,25 @@ const TESTIMONIAL_AVATAR =
 
 async function getFeaturedServices(): Promise<Service[]> {
   try {
-    const all = await fetchServices()
-    return all.slice(0, 3)
+    return await fetchServices({ featured: true })
+  } catch {
+    return []
+  }
+}
+
+async function getFeaturedPromos(): Promise<WorkerPromotion[]> {
+  try {
+    return await fetchPromotions({ featured: true })
   } catch {
     return []
   }
 }
 
 export default async function Home() {
-  const featuredServices = await getFeaturedServices()
+  const [featuredServices, featuredPromos] = await Promise.all([
+    getFeaturedServices(),
+    getFeaturedPromos(),
+  ])
 
   return (
     <div className="flex flex-col gap-0">
@@ -166,6 +177,23 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Promo del Mes — solo se renderiza si hay promos destacadas */}
+      {featuredPromos.length > 0 && (
+        <section className="bg-primary overflow-hidden py-section-lg">
+          <div className="container">
+            <div className="mb-10 reveal-up">
+              <span className="font-sans text-label-md text-on-primary/60 tracking-widest uppercase block mb-3">
+                Ofertas especiales
+              </span>
+              <h2 className="font-serif text-display-lg-mobile md:text-display-lg text-on-primary font-normal">
+                Promo del Mes
+              </h2>
+            </div>
+            <PromoCarousel promos={featuredPromos} />
+          </div>
+        </section>
+      )}
 
       {/* Testimonial Section */}
       <section className="py-section-lg bg-surface relative">
