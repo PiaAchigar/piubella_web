@@ -36,7 +36,7 @@ export function TrainingCard({ training }: { training: Training }) {
   const waHref = `${WHATSAPP_BASE}?text=${waMessage}`
 
   return (
-    <div className="asymmetric-item group reveal-up">
+    <div className="asymmetric-item group">
       <div className="bg-surface rounded-xl overflow-hidden elegant-shadow transition-transform duration-500 hover:-translate-y-2 h-full flex flex-col">
         <div className="p-8 flex flex-col flex-grow">
           {modalityLabel && (
