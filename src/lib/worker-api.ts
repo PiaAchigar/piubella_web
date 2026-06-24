@@ -1,5 +1,5 @@
 import { workerGet } from '@/lib/worker-client'
-import { Service, TimeSlot } from '@/types'
+import { Service, Training, TimeSlot } from '@/types'
 
 // ─── Tipos que devuelve el Worker ────────────────────────────────────────────
 
@@ -163,4 +163,55 @@ export async function fetchPromotions(
   return (await workerGet(`/api/agenda/promotions${qs}`, {
     next: { revalidate: fetchOptions?.revalidate ?? 1800 },
   })) as WorkerPromotion[]
+}
+
+// ─── Capacitaciones (training) ─────────────────────────────────────────────────
+
+export interface WorkerTraining {
+  id: string
+  name: string | null
+  description: string | null
+  modality: string | null
+  location: string | null
+  totalSessions: number | null
+  durationPerSessionMinutes: number | null
+  prerequisitesText: string | null
+  maxParticipants: number | null
+  includesCertification: boolean | null
+  certificationTitle: string | null
+  listPrice: number | null
+  cashPrice: number | null
+  taxCategory: string | null
+  isFeatured: boolean | null
+  isVisible: boolean | null
+  webSortOrder: number | null
+}
+
+export function mapTraining(t: WorkerTraining): Training {
+  return {
+    id: t.id,
+    name: t.name,
+    description: t.description,
+    modality: t.modality,
+    location: t.location,
+    totalSessions: t.totalSessions,
+    durationPerSessionMinutes: t.durationPerSessionMinutes,
+    prerequisitesText: t.prerequisitesText,
+    maxParticipants: t.maxParticipants,
+    includesCertification: t.includesCertification,
+    certificationTitle: t.certificationTitle,
+    listPrice: t.listPrice,
+    cashPrice: t.cashPrice,
+  }
+}
+
+export async function fetchTrainings(
+  params?: { featured?: boolean },
+  fetchOptions?: { revalidate?: number },
+): Promise<Training[]> {
+  const qs = params?.featured ? '?featured=true' : ''
+  const raw = (await workerGet(`/api/agenda/trainings${qs}`, {
+    next: { revalidate: fetchOptions?.revalidate ?? 3600 },
+  })) as WorkerTraining[]
+  return raw.map(mapTraining)
 }

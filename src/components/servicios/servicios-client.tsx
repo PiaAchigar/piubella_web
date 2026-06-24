@@ -2,14 +2,17 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { Service } from '@/types'
+import { Service, Training } from '@/types'
 import { CategoryNode } from './types'
 import { SidebarNav } from './sidebar-nav'
 import { ServiceCard } from './service-card'
+import { TrainingCard } from '@/components/capacitaciones/training-card'
+import { TrainingJsonLd } from '@/components/capacitaciones/capacitaciones-section'
 
 interface Props {
   tree: CategoryNode[]
   allServices: Service[]
+  trainings: Training[]
 }
 
 // Renderiza una sección de categoría recursivamente con niveles de heading apropiados
@@ -37,7 +40,7 @@ function CategorySection({ node, depth }: { node: CategoryNode; depth: number })
   })()
 
   return (
-    <div id={`cat-${node.id}`}>
+    <div id={`cat-${node.id}`} className="scroll-mt-[110px]">
       {headingEl}
 
       {node.services.length > 0 && (
@@ -55,7 +58,7 @@ function CategorySection({ node, depth }: { node: CategoryNode; depth: number })
   )
 }
 
-export function ServiciosClient({ tree, allServices }: Props) {
+export function ServiciosClient({ tree, allServices, trainings }: Props) {
   const [query, setQuery] = useState('')
   const [showAll, setShowAll] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -130,7 +133,7 @@ export function ServiciosClient({ tree, allServices }: Props) {
               <div className="h-0.5 bg-outline-variant/30 mx-4 flex-shrink-0" />
               {/* Área scrolleable — flex-1 + min-h-0 para que el flex no rompa el scroll */}
               <div className="flex-1 min-h-0 overflow-y-auto sidebar-scroll">
-                <SidebarNav tree={tree} />
+                <SidebarNav tree={tree} hasTrainings={trainings.length > 0} />
               </div>
             </>
           )}
@@ -201,6 +204,21 @@ export function ServiciosClient({ tree, allServices }: Props) {
               <p className="font-sans text-body-md text-on-surface-variant">
                 No hay servicios disponibles en este momento.
               </p>
+            )}
+
+            {/* Capacitaciones — última "categoría" del listado */}
+            {trainings.length > 0 && (
+              <div id="cat-capacitaciones" className="scroll-mt-[110px]">
+                <TrainingJsonLd trainings={trainings} />
+                <h2 className="font-serif text-display-lg-mobile text-on-surface border-b border-outline-variant/30 pb-4 mb-8">
+                  Capacitaciones
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {trainings.map((t) => (
+                    <TrainingCard key={t.id} training={t} />
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         )}
@@ -288,7 +306,7 @@ export function ServiciosClient({ tree, allServices }: Props) {
             <div className="h-0.5 bg-outline-variant/30 mx-1" />
 
             {/* Nav de categorías */}
-            <SidebarNav tree={tree} onLinkClick={closeDrawer} />
+            <SidebarNav tree={tree} hasTrainings={trainings.length > 0} onLinkClick={closeDrawer} />
 
             {/* Espacio al final para que no quede pegado al borde */}
             <div className="h-4" />

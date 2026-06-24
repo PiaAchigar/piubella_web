@@ -41,3 +41,5 @@ drizzle/*.sql
 # Logs
 logs
 *.log
+
+tsconfig.tsbuildinfo

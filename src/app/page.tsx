@@ -1,9 +1,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { RevealObserver } from '@/components/ui/reveal-observer'
-import { fetchServices, fetchPromotions, WorkerPromotion } from '@/lib/worker-api'
-import { Service } from '@/types'
+import { fetchServices, fetchPromotions, fetchTrainings, WorkerPromotion } from '@/lib/worker-api'
+import { Service, Training } from '@/types'
 import { PromoCarousel } from '@/components/servicios/promo-carousel'
+import { CapacitacionesSection } from '@/components/capacitaciones/capacitaciones-section'
 
 const NOSOTROS_IMG_1 =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCpvQE7n_ihNG9PSVU5xhch2Q88-og7-yOKkScggtZ8toZR8Py1fEUUIGw4EaazAaBWK88PxZ8G_R519MVhx_U88nYXW5lMBctDxrjaVmtjZJYGpEUyS6vnIqmAasi9lLqOJYR_R3dIXhBEueacPUkBvh-NeSWGUXjAGSHZ8PfzvqA3Z0ps_a9VNqF1Nsj5Izp-Fh-yvE_IrQNIsuSiwEuvXNfHGeP_ILiueYsq2XnkgFoAA-U4ZsdqbiN_AfU0E2yfBrNUb3HBHS16'
@@ -28,10 +29,19 @@ async function getFeaturedPromos(): Promise<WorkerPromotion[]> {
   }
 }
 
+async function getFeaturedTrainings(): Promise<Training[]> {
+  try {
+    return await fetchTrainings({ featured: true })
+  } catch {
+    return []
+  }
+}
+
 export default async function Home() {
-  const [featuredServices, featuredPromos] = await Promise.all([
+  const [featuredServices, featuredPromos, featuredTrainings] = await Promise.all([
     getFeaturedServices(),
     getFeaturedPromos(),
+    getFeaturedTrainings(),
   ])
 
   return (
@@ -177,7 +187,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
+      <CapacitacionesSection trainings={featuredTrainings} variant="home" />
       {/* Promo del Mes — solo se renderiza si hay promos destacadas */}
       {featuredPromos.length > 0 && (
         <section className="bg-primary overflow-hidden py-section-lg">

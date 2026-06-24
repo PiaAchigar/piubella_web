@@ -1,5 +1,5 @@
-import { fetchCategoryTree, fetchServices, WorkerCategory } from '@/lib/worker-api'
-import { Service } from '@/types'
+import { fetchCategoryTree, fetchServices, fetchTrainings, WorkerCategory } from '@/lib/worker-api'
+import { Service, Training } from '@/types'
 import { CategoryNode } from '@/components/servicios/types'
 import { ServiciosClient } from '@/components/servicios/servicios-client'
 import { PromosHero } from '@/components/servicios/promos-hero'
@@ -51,10 +51,11 @@ function flattenUnique(nodes: CategoryNode[]): Service[] {
 export default async function Servicios() {
   const tree = await getCategoryTree()
   const allServices = flattenUnique(tree)
+  const trainings = await fetchTrainings().catch(() => [] as Training[])
   return (
     <>
       <PromosHero />
-      <ServiciosClient tree={tree} allServices={allServices} />
+      <ServiciosClient tree={tree} allServices={allServices} trainings={trainings} />
     </>
   )
 }

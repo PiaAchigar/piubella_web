@@ -16,6 +16,22 @@ export interface Service {
   updated_at: Date
 }
 
+export interface Training {
+  id: string
+  name: string | null
+  description: string | null
+  modality: string | null // 'in_person' | 'online' | 'hybrid'
+  location: string | null
+  totalSessions: number | null
+  durationPerSessionMinutes: number | null
+  prerequisitesText: string | null
+  maxParticipants: number | null
+  includesCertification: boolean | null
+  certificationTitle: string | null
+  listPrice: number | null
+  cashPrice: number | null
+}
+
 export interface ServiceProvider {
   id: string
   name: string
