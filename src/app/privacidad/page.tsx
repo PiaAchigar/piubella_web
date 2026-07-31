@@ -16,8 +16,10 @@ export default function PrivacidadPage() {
         <p>
           El responsable del tratamiento de los datos personales recabados a través del sitio{' '}
           <a href="https://www.piubellaesteticapilates.com.ar">www.piubellaesteticapilates.com.ar</a>{' '}
-          es Piu Bella Estética Pilates, con domicilio en México 1122, Provincia de Buenos Aires,
-          Argentina. Podés contactarnos por correo a{' '}
+          es Laura Da Ruda (Piu Bella Estética Pilates), CUIT 2720515983 [VERIFICAR: el CUIT
+          tiene 10 dígitos, un CUIT válido tiene 11 — confirmá el número completo], con domicilio
+          en México 1120, El Talar, Provincia de Buenos Aires, Argentina. Podés contactarnos por
+          correo a{' '}
           <a href="mailto:info@piubellaesteticapilates.com.ar">
             info@piubellaesteticapilates.com.ar
           </a>{' '}
