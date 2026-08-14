@@ -32,6 +32,18 @@ export interface Training {
   cashPrice: number | null
 }
 
+// Actividades (Pilates Reformer, Pilates Power 360, Thermobike) — tabla `activities`.
+// name, activityType, classesPerMonth y monthlyBasePrice están declarados nullable
+// en el schema (sin .notNull()), así que se tipan tal cual vienen del Worker.
+export interface Activity {
+  id: string
+  name: string | null
+  description: string | null
+  activityType: string | null // 'class' | 'machine'
+  classesPerMonth: number | null
+  monthlyBasePrice: string | null
+}
+
 export interface ServiceProvider {
   id: string
   name: string

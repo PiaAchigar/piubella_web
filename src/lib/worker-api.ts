@@ -1,5 +1,5 @@
 import { workerGet } from '@/lib/worker-client'
-import { Service, Training, TimeSlot } from '@/types'
+import { Activity, Service, Training, TimeSlot } from '@/types'
 
 // ─── Tipos que devuelve el Worker ────────────────────────────────────────────
 
@@ -214,4 +214,15 @@ export async function fetchTrainings(
     next: { revalidate: fetchOptions?.revalidate ?? 3600 },
   })) as WorkerTraining[]
   return raw.map(mapTraining)
+}
+
+// ─── Actividades (Pilates Reformer, Pilates Power 360, Thermobike) ─────────────
+// El endpoint público ya devuelve exactamente la forma de `Activity` (sin mapper).
+
+export async function fetchActivities(
+  fetchOptions?: { revalidate?: number },
+): Promise<Activity[]> {
+  return (await workerGet('/api/agenda/activities', {
+    next: { revalidate: fetchOptions?.revalidate ?? 600 },
+  })) as Activity[]
 }

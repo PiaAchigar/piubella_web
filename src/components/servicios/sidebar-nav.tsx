@@ -76,10 +76,12 @@ function NavItem({ node, depth, openIds, toggle, onLinkClick }: NavItemProps) {
 export function SidebarNav({
   tree,
   hasTrainings = false,
+  hasActivities = false,
   onLinkClick,
 }: {
   tree: CategoryNode[]
   hasTrainings?: boolean
+  hasActivities?: boolean
   onLinkClick?: () => void
 }) {
   const [openIds, setOpenIds] = useState<Set<string>>(new Set())
@@ -103,6 +105,20 @@ export function SidebarNav({
           onLinkClick={onLinkClick}
         />
       ))}
+
+      {/* Actividades — se comporta como una categoría más (ancla a su sección) */}
+      {hasActivities && (
+        <div className="flex items-center gap-1 my-0.5 mx-2 rounded-lg hover:bg-surface-variant/50 transition-all" style={{ paddingLeft: '8px' }}>
+          <span className="material-symbols-outlined text-outline text-base flex-shrink-0">fitness_center</span>
+          <a
+            href="#cat-actividades"
+            onClick={onLinkClick}
+            className="flex-1 py-2 text-on-surface-variant hover:text-primary transition-colors font-sans text-label-sm"
+          >
+            Actividades
+          </a>
+        </div>
+      )}
 
       {/* Capacitaciones — se comporta como una categoría más (ancla a su sección) */}
       {hasTrainings && (

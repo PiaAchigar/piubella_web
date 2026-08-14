@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { Service, Training } from '@/types'
+import { Activity, Service, Training } from '@/types'
 import { CategoryNode } from './types'
 import { SidebarNav } from './sidebar-nav'
 import { ServiceCard } from './service-card'
+import { ActivityCard } from './activity-card'
 import { TrainingCard } from '@/components/capacitaciones/training-card'
 import { TrainingJsonLd } from '@/components/capacitaciones/capacitaciones-section'
 
@@ -13,6 +14,7 @@ interface Props {
   tree: CategoryNode[]
   allServices: Service[]
   trainings: Training[]
+  activities: Activity[]
 }
 
 // Renderiza una sección de categoría recursivamente con niveles de heading apropiados
@@ -58,7 +60,7 @@ function CategorySection({ node, depth }: { node: CategoryNode; depth: number })
   )
 }
 
-export function ServiciosClient({ tree, allServices, trainings }: Props) {
+export function ServiciosClient({ tree, allServices, trainings, activities }: Props) {
   const [query, setQuery] = useState('')
   const [showAll, setShowAll] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -133,7 +135,7 @@ export function ServiciosClient({ tree, allServices, trainings }: Props) {
               <div className="h-0.5 bg-outline-variant/30 mx-4 flex-shrink-0" />
               {/* Área scrolleable — flex-1 + min-h-0 para que el flex no rompa el scroll */}
               <div className="flex-1 min-h-0 overflow-y-auto sidebar-scroll">
-                <SidebarNav tree={tree} hasTrainings={trainings.length > 0} />
+                <SidebarNav tree={tree} hasTrainings={trainings.length > 0} hasActivities={activities.length > 0} />
               </div>
             </>
           )}
@@ -204,6 +206,20 @@ export function ServiciosClient({ tree, allServices, trainings }: Props) {
               <p className="font-sans text-body-md text-on-surface-variant">
                 No hay servicios disponibles en este momento.
               </p>
+            )}
+
+            {/* Actividades — vienen de `activities`, no del árbol de categorías */}
+            {activities.length > 0 && (
+              <div id="cat-actividades" className="scroll-mt-[110px]">
+                <h2 className="font-serif text-display-lg-mobile text-on-surface border-b border-outline-variant/30 pb-4 mb-8">
+                  Actividades
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {activities.map((a) => (
+                    <ActivityCard key={a.id} activity={a} />
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Capacitaciones — última "categoría" del listado */}
@@ -306,7 +322,7 @@ export function ServiciosClient({ tree, allServices, trainings }: Props) {
             <div className="h-0.5 bg-outline-variant/30 mx-1" />
 
             {/* Nav de categorías */}
-            <SidebarNav tree={tree} hasTrainings={trainings.length > 0} onLinkClick={closeDrawer} />
+            <SidebarNav tree={tree} hasTrainings={trainings.length > 0} hasActivities={activities.length > 0} onLinkClick={closeDrawer} />
 
             {/* Espacio al final para que no quede pegado al borde */}
             <div className="h-4" />

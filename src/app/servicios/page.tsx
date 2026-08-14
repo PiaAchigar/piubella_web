@@ -1,5 +1,5 @@
-import { fetchCategoryTree, fetchServices, fetchTrainings, WorkerCategory } from '@/lib/worker-api'
-import { Service, Training } from '@/types'
+import { fetchActivities, fetchCategoryTree, fetchServices, fetchTrainings, WorkerCategory } from '@/lib/worker-api'
+import { Activity, Service, Training } from '@/types'
 import { CategoryNode } from '@/components/servicios/types'
 import { ServiciosClient } from '@/components/servicios/servicios-client'
 import { PromosHero } from '@/components/servicios/promos-hero'
@@ -52,10 +52,13 @@ export default async function Servicios() {
   const tree = await getCategoryTree()
   const allServices = flattenUnique(tree)
   const trainings = await fetchTrainings().catch(() => [] as Training[])
+  // Actividades (Pilates, Thermobike) viven en su propia tabla, no en `service`;
+  // si el Worker no responde, /servicios igual renderiza sin esta sección.
+  const activities = await fetchActivities().catch(() => [] as Activity[])
   return (
     <>
       <PromosHero />
-      <ServiciosClient tree={tree} allServices={allServices} trainings={trainings} />
+      <ServiciosClient tree={tree} allServices={allServices} trainings={trainings} activities={activities} />
     </>
   )
 }
