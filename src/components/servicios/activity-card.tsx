@@ -25,10 +25,18 @@ export function ActivityCard({ activity }: { activity: Activity }) {
   const price = priceAR(activity.monthlyBasePrice)
   const activityName = activity.name ?? 'Actividad'
 
+  // `monthly_base_price` guarda dos cosas distintas según la actividad: el abono
+  // del mes, o el precio de una clase suelta. La base no las distingue con un
+  // campo, así que el único indicio es el nombre. Es frágil a propósito y está
+  // anotado como deuda: lo correcto sería una columna en `activities`.
+  const esClaseSuelta = /clase suelta|prueba/i.test(activityName)
+  const priceLabel = esClaseSuelta ? 'Por clase' : 'Abono mensual'
+
+  // NO se muestra `classesPerMonth`: hoy el dato es inconsistente en producción
+  // (las clases sueltas de Pilates dicen 12, y los abonos de Thermobike dicen 0),
+  // así que mostrarlo confundiría más que ayudar. Volver a habilitarlo cuando
+  // Laura corrija esos valores desde el ABM de Actividades.
   const meta: string[] = []
-  if (activity.classesPerMonth != null && activity.classesPerMonth > 0) {
-    meta.push(`${activity.classesPerMonth} ${activity.classesPerMonth === 1 ? 'clase' : 'clases'} por mes`)
-  }
 
   const waMessage = encodeURIComponent(`Hola! Quiero más información sobre la actividad "${activityName}".`)
   const waHref = `${WHATSAPP_BASE}?text=${waMessage}`
@@ -61,7 +69,7 @@ export function ActivityCard({ activity }: { activity: Activity }) {
             <div className="flex items-end gap-6 mt-auto pt-4 border-t border-outline-variant/30">
               <div className="flex flex-col">
                 <span className="font-sans text-label-sm text-on-surface-variant">
-                  Abono mensual
+                  {priceLabel}
                 </span>
                 <span className="font-sans text-label-md text-primary font-bold">
                   {price}
