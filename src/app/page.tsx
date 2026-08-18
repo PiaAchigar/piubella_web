@@ -5,6 +5,7 @@ import { fetchServices, fetchPromotions, fetchTrainings, WorkerPromotion } from 
 import { Service, Training } from '@/types'
 import { PromoCarousel } from '@/components/servicios/promo-carousel'
 import { CapacitacionesSection } from '@/components/capacitaciones/capacitaciones-section'
+import { TreatmentSearchSection } from '@/components/home/treatment-search-section'
 
 const NOSOTROS_IMG_1 =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCpvQE7n_ihNG9PSVU5xhch2Q88-og7-yOKkScggtZ8toZR8Py1fEUUIGw4EaazAaBWK88PxZ8G_R519MVhx_U88nYXW5lMBctDxrjaVmtjZJYGpEUyS6vnIqmAasi9lLqOJYR_R3dIXhBEueacPUkBvh-NeSWGUXjAGSHZ8PfzvqA3Z0ps_a9VNqF1Nsj5Izp-Fh-yvE_IrQNIsuSiwEuvXNfHGeP_ILiueYsq2XnkgFoAA-U4ZsdqbiN_AfU0E2yfBrNUb3HBHS16'
@@ -86,6 +87,16 @@ export default async function Home() {
           </div>
         </div>
       </header>
+
+      {/* Treatment Search Section */}
+      <section className="py-section-lg">
+        <div className="container">
+          <h3 className="font-serif text-headline-md md:text-display-lg text-on-surface mb-16 font-normal">
+            Contanos cuál es tu objetivo y te ayudamos a encontrar el tratamiento adecuado.
+          </h3>
+          <TreatmentSearchSection />
+        </div>
+      </section>
 
       {/* Nosotros Section */}
       <section className="py-section-lg bg-surface relative overflow-hidden">
