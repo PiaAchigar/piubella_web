@@ -32,11 +32,10 @@ export function ActivityCard({ activity }: { activity: Activity }) {
   const esClaseSuelta = /clase suelta|prueba/i.test(activityName)
   const priceLabel = esClaseSuelta ? 'Por clase' : 'Abono mensual'
 
-  // NO se muestra `classesPerMonth`: hoy el dato es inconsistente en producción
-  // (las clases sueltas de Pilates dicen 12, y los abonos de Thermobike dicen 0),
-  // así que mostrarlo confundiría más que ayudar. Volver a habilitarlo cuando
-  // Laura corrija esos valores desde el ABM de Actividades.
   const meta: string[] = []
+  if (activity.classesPerMonth != null && activity.classesPerMonth > 0) {
+    meta.push(`${activity.classesPerMonth} ${activity.classesPerMonth === 1 ? 'clase' : 'clases'} por mes`)
+  }
 
   const waMessage = encodeURIComponent(`Hola! Quiero más información sobre la actividad "${activityName}".`)
   const waHref = `${WHATSAPP_BASE}?text=${waMessage}`
