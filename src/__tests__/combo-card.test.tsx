@@ -33,6 +33,9 @@ describe('ComboCard', () => {
   it('tacha el subtotal cuando el combo sale más barato', () => {
     render(<ComboCard combo={base} />)
     expect(screen.getByText('$200.000')).toBeInTheDocument()
+    const subtotal = screen.getByTestId('combo-subtotal')
+    expect(subtotal).toBeInTheDocument()
+    expect(subtotal).toHaveClass('line-through')
   })
 
   it('no muestra subtotal tachado si no hay ahorro', () => {
@@ -43,5 +46,16 @@ describe('ComboCard', () => {
   it('muestra la vigencia en meses', () => {
     render(<ComboCard combo={base} />)
     expect(screen.getByText(/12 meses para usarlas/i)).toBeInTheDocument()
+  })
+
+  it('usa el singular "sesión" cuando la línea incluye una sola sesión', () => {
+    const combo: WorkerCombo = {
+      ...base,
+      lines: [
+        { id: 'l1', serviceId: 's1', serviceName: 'Media pierna', sessionsIncluded: 1, servicePrice: 15000 },
+      ],
+    }
+    render(<ComboCard combo={combo} />)
+    expect(screen.getByText('1 sesión de Media pierna')).toBeInTheDocument()
   })
 })
