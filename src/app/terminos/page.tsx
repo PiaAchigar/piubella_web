@@ -188,12 +188,11 @@ export default function TerminosPage() {
       <section>
         <h2>12. Contacto</h2>
         <p>
-          Para consultas sobre estos términos, escribinos a{' '}
+          Para consultas sobre estos términos, escribinos al{' '}
+          <a href="https://wa.me/5491133775014">+54 9 11 3377 5014</a>, o por mail a{' '}
           <a href="mailto:info@piubellaesteticapilates.com.ar">
             info@piubellaesteticapilates.com.ar
-          </a>{' '}
-          o por WhatsApp al{' '}
-          <a href="https://wa.me/5491133775014">+54 9 11 3377 5014</a>.
+          </a>
         </p>
       </section>
     </LegalPageLayout>
