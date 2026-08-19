@@ -165,6 +165,35 @@ export async function fetchPromotions(
   })) as WorkerPromotion[]
 }
 
+// ─── Combos (paquetes de sesiones) ────────────────────────────────────────────
+
+export interface WorkerComboLine {
+  id: string
+  serviceId: string | null
+  serviceName: string | null
+  sessionsIncluded: number | null
+  servicePrice: number | null
+}
+
+export interface WorkerCombo {
+  id: string
+  name: string | null
+  description: string | null
+  priceType: string | null
+  validityMonths: number | null
+  servicesSubtotal: number
+  finalAmount: number
+  lines: WorkerComboLine[]
+}
+
+export async function fetchCombos(
+  fetchOptions?: { revalidate?: number },
+): Promise<WorkerCombo[]> {
+  return (await workerGet('/api/agenda/combos', {
+    next: { revalidate: fetchOptions?.revalidate ?? 1800 },
+  })) as WorkerCombo[]
+}
+
 // ─── Capacitaciones (training) ─────────────────────────────────────────────────
 
 export interface WorkerTraining {
