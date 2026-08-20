@@ -177,21 +177,19 @@ export function TreatmentSearchSection() {
                           </div>
                         )}
                         <div className="mt-auto pt-4 border-t border-outline-variant/30">
-                          <div className="flex items-center justify-between">
-                            {/* `price` viene normalizado por el backend según el kind (service/
-                                activity/training); si es null no mostramos nada en vez de "$0". */}
-                            {treatment.price != null && (
-                              <span className="font-sans text-label-md text-primary font-bold">
-                                ${Number(treatment.price).toLocaleString('es-AR')}
-                                <span className="font-sans text-label-sm text-on-surface-variant font-normal">
-                                  {' '}{treatment.price_label}
-                                </span>
+                          {/* `price` viene normalizado por el backend según el kind (service/
+                              activity/training); si es null no mostramos nada en vez de "$0".
+                              El puntaje de similitud NO se muestra: es una métrica interna del
+                              buscador semántico y a una clienta un "31%" le dice que el
+                              resultado es malo, cuando en realidad no significa nada para ella. */}
+                          {treatment.price != null && (
+                            <span className="font-sans text-label-md text-primary font-bold">
+                              ${Number(treatment.price).toLocaleString('es-AR')}
+                              <span className="font-sans text-label-sm text-on-surface-variant font-normal">
+                                {' '}{treatment.price_label}
                               </span>
-                            )}
-                            <span className="font-sans text-label-sm text-on-surface-variant">
-                              Similitud: {(treatment.similarity_score * 100).toFixed(0)}%
                             </span>
-                          </div>
+                          )}
 
                           {/* Mismas clases que el CTA de activity-card.tsx, para
                               que las tarjetas del buscador se lean como parte
