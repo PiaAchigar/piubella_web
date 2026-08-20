@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { SearchOfferCard, esCombo, type SearchOffer } from './search-offer-card'
 
 type TreatmentResult = {
   id: string
@@ -21,31 +22,21 @@ type TreatmentResult = {
   price_label: string
 }
 
-// Mismo vocabulario que usa el resto del sitio para cada tipo.
+// Mismo vocabulario que usa el resto del sitio para cada tipo. En particular
+// 'service' es "Servicio" y no "Tratamiento": la navegación, el home y la
+// página /servicios dicen "Servicios", y dos nombres para lo mismo obligan a
+// la clienta a deducir que son la misma cosa.
 const KIND_LABELS: Record<TreatmentResult['kind'], string> = {
-  service: 'Tratamiento',
+  service: 'Servicio',
   activity: 'Actividad',
   training: 'Capacitación',
 }
 
-type PromotionResult = {
-  id: string
-  name: string
-  description: string | null
-  promotion_type: string
-  discount_percentage: number | null
-  discount_amount: number | null
-  final_amount: number | null
-  valid_from: Date | null
-  valid_until: Date | null
-  status: string
-  is_featured: boolean
-  services: Array<{ service_id: string; service_name: string }>
-}
-
 type SearchResults = {
   treatments: TreatmentResult[]
-  promotions: PromotionResult[]
+  // El backend devuelve combos y promociones mezclados acá; se separan en el
+  // render por `promotion_type` — ver `esCombo`.
+  promotions: SearchOffer[]
 }
 
 export function TreatmentSearchSection() {
@@ -93,6 +84,10 @@ export function TreatmentSearchSection() {
       setLoading(false)
     }
   }
+
+  const ofertas = results?.promotions ?? []
+  const combos = ofertas.filter(esCombo)
+  const promos = ofertas.filter((o) => !esCombo(o))
 
   return (
     <div>
@@ -182,7 +177,7 @@ export function TreatmentSearchSection() {
                               El puntaje de similitud NO se muestra: es una métrica interna del
                               buscador semántico y a una clienta un "31%" le dice que el
                               resultado es malo, cuando en realidad no significa nada para ella. */}
-                          {treatment.price != null && (
+                          {treatment.price != null && Number(treatment.price) !== 0 && (
                             <span className="font-sans text-label-md text-primary font-bold">
                               ${Number(treatment.price).toLocaleString('es-AR')}
                               <span className="font-sans text-label-sm text-on-surface-variant font-normal">
@@ -223,78 +218,36 @@ export function TreatmentSearchSection() {
               </div>
             )}
 
-            {/* Promotions */}
-            {results.promotions.length > 0 && (
+            {/* Combos y promociones. Vienen mezclados en `results.promotions`
+                y se separan acá: un combo es un paquete de zonas o sesiones,
+                una promoción es un descuento con vigencia. Meterlos en la
+                misma grilla obligaba a leer la letra chica para distinguirlos. */}
+            {combos.length > 0 && (
+              <div className="mb-16">
+                <h3 className="font-serif text-headline-md text-on-surface mb-8">
+                  Combos que incluyen lo que buscás:
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {combos.map((combo) => (
+                    <SearchOfferCard key={combo.id} offer={combo} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {promos.length > 0 && (
               <div>
                 <h3 className="font-serif text-headline-md text-on-surface mb-8">
                   Promociones que te podemos ofrecer alineadas a tu objetivo:
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {results.promotions.map((promo) => (
-                    <div
-                      key={promo.id}
-                      className="bg-primary-container rounded-xl p-8 border-l-4 border-primary flex flex-col"
-                    >
-                      <h4 className="font-serif text-headline-sm text-on-primary-container mb-2 font-medium">
-                        {promo.name}
-                      </h4>
-                      {promo.description && (
-                        <p className="font-sans text-body-sm text-on-primary-container/80 mb-4">
-                          {promo.description}
-                        </p>
-                      )}
-
-                      {/* Discount Info */}
-                      <div className="mb-4 pt-4 border-t border-on-primary-container/20">
-                        <div className="flex items-center gap-4">
-                          {promo.discount_percentage && (
-                            <div>
-                              <span className="font-sans text-label-sm text-on-primary-container/60">
-                                Descuento
-                              </span>
-                              <p className="font-serif text-headline-md text-on-primary-container">
-                                {promo.discount_percentage}%
-                              </p>
-                            </div>
-                          )}
-                          {promo.final_amount && (
-                            <div>
-                              <span className="font-sans text-label-sm text-on-primary-container/60">
-                                Valor Final
-                              </span>
-                              <p className="font-serif text-headline-md text-on-primary-container">
-                                ${Number(promo.final_amount).toLocaleString('es-AR')}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Services */}
-                      {promo.services.length > 0 && (
-                        <div className="mb-4">
-                          <p className="font-sans text-label-sm text-on-primary-container/60 mb-2">
-                            Aplica a:
-                          </p>
-                          <p className="font-sans text-body-sm text-on-primary-container">
-                            {promo.services.map((s) => s.service_name).join(', ')}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Validity */}
-                      {promo.valid_until && (
-                        <div className="mt-auto pt-4 border-t border-on-primary-container/20">
-                          <p className="font-sans text-label-sm text-on-primary-container/60">
-                            Válido hasta {new Date(promo.valid_until).toLocaleDateString('es-AR')}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                  {promos.map((promo) => (
+                    <SearchOfferCard key={promo.id} offer={promo} />
                   ))}
                 </div>
               </div>
             )}
+
           </div>
         )}
       </div>
