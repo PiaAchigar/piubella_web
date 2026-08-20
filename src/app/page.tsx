@@ -91,7 +91,7 @@ export default async function Home() {
       {/* Treatment Search Section */}
       <section className="py-section-lg">
         <div className="container">
-          <h3 className="font-serif text-headline-md md:text-display-lg text-on-surface mb-16 font-normal">
+          <h3 className="font-serif text-headline-sm md:text-display-lg text-on-surface mb-16 font-normal">
             Contanos cuál es tu objetivo y te ayudamos a encontrar el tratamiento adecuado.
           </h3>
           <TreatmentSearchSection />

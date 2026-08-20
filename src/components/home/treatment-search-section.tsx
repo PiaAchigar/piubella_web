@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -53,6 +53,20 @@ export function TreatmentSearchSection() {
   const [results, setResults] = useState<SearchResults | null>(null)
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Hay algo que limpiar si quedó texto escrito o si ya se buscó alguna vez.
+  // El botón no se muestra antes de eso: un control que no hace nada distrae.
+  const puedeLimpiar = query.length > 0 || hasSearched
+
+  const handleClear = () => {
+    setQuery('')
+    setResults(null)
+    setHasSearched(false)
+    // Devolver el foco al campo evita que quien navega con teclado quede
+    // parada en un botón que acaba de desaparecer.
+    inputRef.current?.focus()
+  }
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -87,19 +101,39 @@ export function TreatmentSearchSection() {
         <div className="max-w-4xl mx-auto mb-16">
           <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
             <input
+              ref={inputRef}
               type="text"
               placeholder="¿Cuál es tu objetivo? (Ej: verme más joven, tonificar brazos)"
               value={query}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
               className="flex-1 px-6 py-3 rounded-lg shadow-sm bg-surface-container text-on-surface placeholder-on-surface-variant outline-none border-2 border-transparent focus:border-primary transition-colors"
             />
-            <Button
-              type="submit"
-              disabled={loading}
-              className="bg-primary text-on-primary px-8 py-3 rounded-lg font-sans text-label-md tracking-widest uppercase hover:opacity-90 transition-all disabled:opacity-50 whitespace-nowrap"
-            >
-              {loading ? 'Buscando...' : 'Buscar'}
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="flex-1 sm:flex-none bg-primary text-on-primary px-8 py-3 rounded-lg font-sans text-label-md tracking-widest uppercase hover:opacity-90 transition-all disabled:opacity-50 whitespace-nowrap"
+              >
+                {loading ? 'Buscando...' : 'Buscar'}
+              </Button>
+
+              {/* Limpiar. `type="button"` NO es opcional: dentro de un <form> el
+                  default de un botón es submit, así que sin esto la escobita
+                  dispararía una búsqueda en vez de limpiarla. */}
+              {puedeLimpiar && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  title="Limpiar búsqueda y resultados"
+                  aria-label="Limpiar búsqueda y resultados"
+                  className="shrink-0 px-4 py-3 rounded-lg border-2 border-outline-variant/40 text-on-surface-variant hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 transition-colors"
+                >
+                  <span className="material-symbols-outlined block text-xl leading-none">
+                    cleaning_services
+                  </span>
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
@@ -158,6 +192,19 @@ export function TreatmentSearchSection() {
                               Similitud: {(treatment.similarity_score * 100).toFixed(0)}%
                             </span>
                           </div>
+
+                          {/* Mismas clases que el CTA de activity-card.tsx, para
+                              que las tarjetas del buscador se lean como parte
+                              del mismo sistema y no como un agregado. */}
+                          <Link
+                            href="/agenda"
+                            className="mt-6 flex items-center justify-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-lg font-sans text-label-md tracking-widest uppercase hover:opacity-90 transition-all text-center"
+                          >
+                            Reservar turno
+                            <span className="material-symbols-outlined text-sm leading-none">
+                              arrow_forward
+                            </span>
+                          </Link>
                         </div>
                       </div>
                     </div>
