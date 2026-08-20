@@ -179,7 +179,7 @@ export default function ContactoPage() {
           <h2 className="font-serif text-headline-md mb-2">Nos encontrás en:</h2>
           <div className="w-16 h-px bg-secondary mx-auto mb-6" />
           <p className="font-sans text-body-md text-on-surface-variant">
-            Mexico 1120, El Talar
+            México 1120, El Talar, Tigre, Provincia de Buenos Aires
           </p>
         </div>
         <div className="max-w-[1400px] mx-auto px-gutter">
@@ -189,8 +189,9 @@ export default function ContactoPage() {
               className="absolute inset-0 w-full h-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3289.462810147654!2d-58.647461224835006!3d-34.46578185022566!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bca49d9db1797b%3A0x19b6d0f3a11d2e2c!2sMexico%201120%2C%20B1618%20CSR%2C%20Provincia%20de%20Buenos%20Aires!5e0!3m2!1ses!2sar!4v1787181097922!5m2!1ses!2sar"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3289.462810147654!2d-58.647461224835006!3d-34.46578185022566!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bca49d75e212cf%3A0x8bd85f4ecd7bda2c!2sPiu%20Bella%20Estetica%20y%20Pilates!5e0!3m2!1ses!2sar!4v1787239898213!5m2!1ses!2sar"
             />
+            
             <div className="absolute inset-0 pointer-events-none bg-primary/5 mix-blend-overlay" />
           </div>
         </div>
