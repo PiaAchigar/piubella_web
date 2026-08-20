@@ -6,6 +6,7 @@ import { Service, Training } from '@/types'
 import { PromoCarousel } from '@/components/servicios/promo-carousel'
 import { CapacitacionesSection } from '@/components/capacitaciones/capacitaciones-section'
 import { TreatmentSearchSection } from '@/components/home/treatment-search-section'
+import { FeaturedServiceCard } from '@/components/home/featured-service-card'
 
 const NOSOTROS_IMG_1 =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCpvQE7n_ihNG9PSVU5xhch2Q88-og7-yOKkScggtZ8toZR8Py1fEUUIGw4EaazAaBWK88PxZ8G_R519MVhx_U88nYXW5lMBctDxrjaVmtjZJYGpEUyS6vnIqmAasi9lLqOJYR_R3dIXhBEueacPUkBvh-NeSWGUXjAGSHZ8PfzvqA3Z0ps_a9VNqF1Nsj5Izp-Fh-yvE_IrQNIsuSiwEuvXNfHGeP_ILiueYsq2XnkgFoAA-U4ZsdqbiN_AfU0E2yfBrNUb3HBHS16'
@@ -165,26 +166,7 @@ export default async function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredServices.map((service: Service) => (
-              <div key={service.id} className="asymmetric-item group reveal-up">
-                <div className="bg-surface rounded-xl overflow-hidden elegant-shadow transition-transform duration-500 hover:-translate-y-2 h-full flex flex-col">
-                  <div className="p-8 flex flex-col flex-grow">
-                    <h3 className="font-serif text-headline-sm text-on-surface mb-3 font-medium">
-                      {service.name}
-                    </h3>
-                    <p className="font-sans text-body-md text-on-surface-variant mb-6 flex-grow">
-                      {service.description ?? ''}
-                    </p>
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/30">
-                      <span className="font-sans text-label-md text-on-surface-variant">
-                        {service.duration_minutes} min
-                      </span>
-                      <span className="font-sans text-label-md text-primary font-bold">
-                        ${Number(service.unit_price).toLocaleString('es-AR')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <FeaturedServiceCard key={service.id} service={service} />
             ))}
           </div>
 
