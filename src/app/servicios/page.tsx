@@ -5,9 +5,20 @@ import { ServiciosClient } from '@/components/servicios/servicios-client'
 import { PromosHero } from '@/components/servicios/promos-hero'
 import { CombosSection } from '@/components/servicios/combos-section'
 
+// Las categorías de eje `area` (Estética, Medicina y Dermatología, Masajes y
+// Bienestar...) existen para las PESTAÑAS del dashboard, no para el sitio: acá
+// duplicarían todo el árbol, porque cada servicio ya cuelga de su técnica.
+// Los otros ejes —técnica, objetivo, máquina— sí se muestran, igual que hoy.
+//
+// El filtro por nombre '(Eje)' se mantiene para las dos categorías viejas de la
+// 1.26.0, que están archivadas pero no dependen de `kind`.
+function esVisibleEnLaWeb(c: WorkerCategory): boolean {
+  return c.kind !== 'area' && !c.name.includes('Eje')
+}
+
 // Construye el nodo recursivamente: fetcha servicios propios + recursa en hijos
 async function buildNode(cat: WorkerCategory): Promise<CategoryNode> {
-  const visibleChildren = cat.children.filter((c) => !c.name.includes('Eje'))
+  const visibleChildren = cat.children.filter(esVisibleEnLaWeb)
 
   const [services, children] = await Promise.all([
     fetchServices({ categoryId: cat.id }),
@@ -25,7 +36,7 @@ async function buildNode(cat: WorkerCategory): Promise<CategoryNode> {
 async function getCategoryTree(): Promise<CategoryNode[]> {
   try {
     const tree = await fetchCategoryTree()
-    const visibleRoots = tree.filter((c) => !c.name.includes('Eje'))
+    const visibleRoots = tree.filter(esVisibleEnLaWeb)
     const nodes = await Promise.all(visibleRoots.map((c) => buildNode(c)))
     return nodes.filter((n) => n.services.length > 0 || n.children.length > 0)
   } catch {

@@ -8,6 +8,9 @@ export interface WorkerCategory {
   name: string
   description: string | null
   displayOrder: number
+  /** Eje al que pertenece (migración 1.37.0): area | tecnica | objetivo | maquina.
+   *  Las de eje `area` son las pestañas del dashboard y no van en el sitio. */
+  kind?: string
   children: WorkerCategory[]
 }
 
