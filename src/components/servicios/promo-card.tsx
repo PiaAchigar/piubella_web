@@ -2,7 +2,12 @@ import Link from 'next/link'
 import { WorkerPromotion } from '@/lib/worker-api'
 
 export function PromoCard({ promo }: { promo: WorkerPromotion }) {
-  const price = promo.services[0]?.unitPriceList
+  const descuento =
+    promo.discountPercentage != null
+      ? `${promo.discountPercentage}% OFF`
+      : promo.discountAmount != null
+        ? `$${promo.discountAmount.toLocaleString('es-AR')} de descuento`
+        : null
 
   const validUntilLabel = promo.validUntil
     ? `hasta el ${new Date(promo.validUntil).toLocaleDateString('es-AR', {
@@ -30,28 +35,28 @@ export function PromoCard({ promo }: { promo: WorkerPromotion }) {
         {promo.name}
       </h3>
 
-      {/* Servicios incluidos */}
-      {promo.services.length > 0 && (
+      {/* Lo que está en oferta */}
+      {promo.targets.length > 0 && (
         <ul className="space-y-1.5 flex-grow">
-          {promo.services.map((s) => (
+          {promo.targets.map((t) => (
             <li
-              key={s.id}
+              key={t.id}
               className="font-sans text-body-sm text-on-primary/80 flex items-start gap-2"
             >
               <span className="material-symbols-outlined text-on-primary/50 text-sm mt-0.5 flex-shrink-0">
                 check
               </span>
-              {s.name}
+              {t.nombre}
             </li>
           ))}
         </ul>
       )}
 
-      {/* Precio + CTA */}
+      {/* Descuento + CTA */}
       <div className="flex items-center justify-between pt-4 border-t border-white/20 mt-auto">
-        {price != null ? (
+        {descuento != null ? (
           <span className="font-serif text-headline-sm text-on-primary">
-            ${price.toLocaleString('es-AR')}
+            {descuento}
           </span>
         ) : (
           <span className="font-sans text-label-md text-on-primary/50">Consultar</span>

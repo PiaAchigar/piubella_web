@@ -5,7 +5,6 @@ export async function PromosHero() {
   let promos = []
   try {
     promos = await fetchPromotions()
-    console.log(promos)
   } catch {
     return null
   }

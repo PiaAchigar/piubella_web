@@ -138,12 +138,10 @@ export async function fetchCompanyConfig(): Promise<WorkerCompanyConfig> {
 
 // ─── Promotions ───────────────────────────────────────────────────────────────
 
-export interface WorkerPromotionService {
+export interface WorkerPromotionTarget {
+  tipo: 'servicio' | 'combo' | 'depilacion'
   id: string
-  name: string | null
-  unitPriceList: number | null
-  unitPriceCash: number | null
-  estimatedDurationMinutes: number | null
+  nombre: string | null
 }
 
 export interface WorkerPromotion {
@@ -155,7 +153,7 @@ export interface WorkerPromotion {
   discountAmount: number | null
   validFrom: string | null
   validUntil: string | null
-  services: WorkerPromotionService[]
+  targets: WorkerPromotionTarget[]
 }
 
 export async function fetchPromotions(
