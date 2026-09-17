@@ -12,7 +12,6 @@ export type SearchOffer = {
   promotion_type: string
   discount_percentage: number | null
   discount_amount: number | null
-  final_amount: number | null
   valid_from: Date | null
   valid_until: Date | null
   status: string
@@ -23,9 +22,8 @@ export type SearchOffer = {
 export const esCombo = (oferta: SearchOffer) => oferta.promotion_type === 'bundle'
 
 /**
- * "Tiene precio" significa distinto de null Y distinto de cero. Hoy casi ningún
- * combo cargado tiene importe, y tanto una fila de precio vacía como un "$0"
- * se leen como un error de la página, no como "consultar".
+ * "Tiene descuento" significa distinto de null Y distinto de cero: un "0%" se
+ * lee como un error de la página, no como "consultar".
  */
 const conValor = (n: number | null): n is number => n != null && Number(n) !== 0
 
@@ -46,9 +44,10 @@ export function fechaCorta(valor: Date | string): string {
 export function SearchOfferCard({ offer }: { offer: SearchOffer }) {
   const combo = esCombo(offer)
 
+  // `final_amount` salió del backend con la 1.53.0: una promo ya no tiene un
+  // total propio, el descuento se aplica al vender sobre lo que la clienta se
+  // lleve. Lo que se puede anunciar acá es el descuento, no un valor final.
   const porcentaje = conValor(offer.discount_percentage) ? offer.discount_percentage : null
-  const importeFinal = conValor(offer.final_amount) ? offer.final_amount : null
-  const tienePrecio = porcentaje != null || importeFinal != null
 
   return (
     <div className="bg-primary-container rounded-xl p-8 border-l-4 border-primary flex flex-col h-full">
@@ -79,31 +78,15 @@ export function SearchOfferCard({ offer }: { offer: SearchOffer }) {
         </div>
       )}
 
-      {/* Pie: precio (solo si existe), vigencia y CTA. `mt-auto` lo pega abajo
+      {/* Pie: descuento (solo si existe), vigencia y CTA. `mt-auto` lo pega abajo
           para que todas las tarjetas de la grilla terminen a la misma altura. */}
       <div className="mt-auto pt-4 border-t border-on-primary-container/20">
-        {tienePrecio && (
+        {porcentaje != null && (
           <div className="flex items-center gap-6 mb-4">
-            {porcentaje != null && (
-              <div>
-                <span className="font-sans text-label-sm text-on-primary-container/60">
-                  Descuento
-                </span>
-                <p className="font-serif text-headline-md text-on-primary-container">
-                  {porcentaje}%
-                </p>
-              </div>
-            )}
-            {importeFinal != null && (
-              <div>
-                <span className="font-sans text-label-sm text-on-primary-container/60">
-                  Valor final
-                </span>
-                <p className="font-serif text-headline-md text-on-primary-container">
-                  ${Number(importeFinal).toLocaleString('es-AR')}
-                </p>
-              </div>
-            )}
+            <div>
+              <span className="font-sans text-label-sm text-on-primary-container/60">Descuento</span>
+              <p className="font-serif text-headline-md text-on-primary-container">{porcentaje}%</p>
+            </div>
           </div>
         )}
 

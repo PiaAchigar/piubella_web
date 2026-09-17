@@ -9,7 +9,6 @@ const oferta = (over: Partial<SearchOffer> = {}): SearchOffer => ({
   promotion_type: 'bundle',
   discount_percentage: null,
   discount_amount: null,
-  final_amount: null,
   valid_from: null,
   valid_until: null,
   status: 'active',
@@ -48,29 +47,34 @@ describe('SearchOfferCard', () => {
     ).toBeInTheDocument()
   })
 
-  it('muestra el precio y el descuento cuando tienen valor', () => {
-    render(<SearchOfferCard offer={oferta({ discount_percentage: 10, final_amount: 36000 })} />)
+  it('muestra el descuento cuando tiene valor', () => {
+    render(<SearchOfferCard offer={oferta({ discount_percentage: 10 })} />)
     expect(screen.getByText('10%')).toBeInTheDocument()
-    expect(screen.getByText('$36.000')).toBeInTheDocument()
   })
 
-  it('no dibuja el bloque de precio cuando no hay importe ni descuento', () => {
-    render(<SearchOfferCard offer={oferta()} />)
+  it('ya no anuncia un "Valor final": la promo no tiene un total propio', () => {
+    // `final_amount` salió del backend con la 1.53.0 — el descuento se aplica
+    // al vender, sobre lo que la clienta se lleve.
+    render(<SearchOfferCard offer={oferta({ discount_percentage: 10 })} />)
     expect(screen.queryByText('Valor final')).not.toBeInTheDocument()
+  })
+
+  it('no dibuja el bloque de descuento cuando no hay descuento', () => {
+    render(<SearchOfferCard offer={oferta()} />)
     expect(screen.queryByText('Descuento')).not.toBeInTheDocument()
   })
 
-  it('trata el 0 como "sin precio" y no lo muestra', () => {
-    render(<SearchOfferCard offer={oferta({ discount_percentage: 0, final_amount: 0 })} />)
-    expect(screen.queryByText('Valor final')).not.toBeInTheDocument()
-    expect(screen.queryByText('$0')).not.toBeInTheDocument()
+  it('trata el 0 como "sin descuento" y no lo muestra', () => {
+    render(<SearchOfferCard offer={oferta({ discount_percentage: 0 })} />)
+    expect(screen.queryByText('Descuento')).not.toBeInTheDocument()
+    expect(screen.queryByText('0%')).not.toBeInTheDocument()
   })
 
   it('siempre lleva el CTA a la agenda, tenga precio o no', () => {
     const { rerender } = render(<SearchOfferCard offer={oferta()} />)
     expect(screen.getByRole('link', { name: /Reservar turno/ })).toHaveAttribute('href', '/agenda')
 
-    rerender(<SearchOfferCard offer={oferta({ promotion_type: 'percentage', final_amount: 36000 })} />)
+    rerender(<SearchOfferCard offer={oferta({ promotion_type: 'percentage', discount_percentage: 10 })} />)
     expect(screen.getByRole('link', { name: /Reservar turno/ })).toHaveAttribute('href', '/agenda')
   })
 })
