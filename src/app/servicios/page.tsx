@@ -15,7 +15,6 @@ import { Activity, Service, Training } from '@/types'
 import { CategoryNode } from '@/components/servicios/types'
 import { ServiciosClient } from '@/components/servicios/servicios-client'
 import { PromosHero } from '@/components/servicios/promos-hero'
-import { CombosSection } from '@/components/servicios/combos-section'
 
 // Las categorías de eje `area` (Estética, Medicina y Dermatología, Masajes y
 // Bienestar...) existen para las PESTAÑAS del dashboard, no para el sitio: acá
@@ -87,7 +86,6 @@ export default async function Servicios() {
   return (
     <>
       <PromosHero />
-      <CombosSection />
       <ServiciosClient
         tree={tree}
         allServices={allServices}

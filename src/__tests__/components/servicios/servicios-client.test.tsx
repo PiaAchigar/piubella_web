@@ -104,6 +104,31 @@ describe('ServiciosClient — los cuatro botones', () => {
 // botones del drawer móvil y su `closeDrawer()` no los probaba nadie. El drawer es
 // la mitad del rediseño que ve quien entra desde el celular, así que va aparte,
 // distinguido por el `aria-label` del grupo (más estable que un índice posicional).
+describe('ServiciosClient — combos dentro del árbol', () => {
+  const arbol = [
+    { id: 'k1', name: 'Belleza', services: [], children: [] },
+    { id: 'k9', name: 'Masajes', services: [], children: [] },
+  ]
+
+  it('el combo aparece en la clasificación que tiene alguno de sus servicios', () => {
+    montar({ tree: arbol })
+    expect(screen.getByText('Combo Facial')).toBeInTheDocument()
+  })
+
+  it('NO aparece en una clasificación que no es suya', () => {
+    montar({ tree: [{ id: 'k9', name: 'Masajes', services: [], children: [] }] })
+    expect(screen.queryByText('Combo Facial')).toBeNull()
+  })
+
+  it('un combo de dos clasificaciones sale en las dos', () => {
+    montar({
+      tree: arbol,
+      combos: [{ ...combo, clasificaciones: [{ id: 'k1', name: 'Belleza' }, { id: 'k9', name: 'Masajes' }] }],
+    })
+    expect(screen.getAllByText('Combo Facial')).toHaveLength(2)
+  })
+})
+
 describe('ServiciosClient — el drawer móvil también tiene los cuatro botones', () => {
   it('están los cuatro, con las mismas etiquetas', () => {
     montar()

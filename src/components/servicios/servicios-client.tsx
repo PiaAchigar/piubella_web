@@ -10,7 +10,7 @@ import { ActivityCard } from './activity-card'
 import { TrainingCard } from '@/components/capacitaciones/training-card'
 import { TrainingJsonLd } from '@/components/capacitaciones/capacitaciones-section'
 import { BOTONES, type ModoCatalogo } from './modo-catalogo'
-import { agruparPorArea, type Grupo } from '@/lib/agrupar-catalogo'
+import { agruparPorArea, combosDeClasificacion, type Grupo } from '@/lib/agrupar-catalogo'
 import { ComboCard } from './combo-card'
 import { PackCard } from './pack-card'
 import { PromoCard } from './promo-card'
@@ -68,7 +68,15 @@ function ListaPorArea<T extends { id: string }>({
 }
 
 // Renderiza una sección de categoría recursivamente con niveles de heading apropiados
-function CategorySection({ node, depth }: { node: CategoryNode; depth: number }) {
+function CategorySection({
+  node,
+  depth,
+  combos,
+}: {
+  node: CategoryNode
+  depth: number
+  combos: WorkerCombo[]
+}) {
   const headingEl = (() => {
     if (depth === 0) {
       return (
@@ -91,6 +99,11 @@ function CategorySection({ node, depth }: { node: CategoryNode; depth: number })
     )
   })()
 
+  // Los combos cuelgan de la CLASIFICACIÓN, que es la raíz del árbol. En un
+  // nivel más hondo no significan nada: un combo no pertenece a una
+  // subcategoría, pertenece a la clasificación entera.
+  const misCombos = depth === 0 ? combosDeClasificacion(combos, node.id) : []
+
   return (
     <div id={`cat-${node.id}`} className="scroll-mt-[110px]">
       {headingEl}
@@ -103,8 +116,16 @@ function CategorySection({ node, depth }: { node: CategoryNode; depth: number })
         </div>
       )}
 
+      {misCombos.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {misCombos.map((c) => (
+            <ComboCard key={c.id} combo={c} variante="claro" />
+          ))}
+        </div>
+      )}
+
       {node.children.map((child) => (
-        <CategorySection key={child.id} node={child} depth={depth + 1} />
+        <CategorySection key={child.id} node={child} depth={depth + 1} combos={combos} />
       ))}
     </div>
   )
@@ -259,7 +280,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
           <div className="space-y-16">
             {tree.map((node) => (
               <div key={node.id}>
-                <CategorySection node={node} depth={0} />
+                <CategorySection node={node} depth={0} combos={combos} />
                 <div className="mt-8">
                   <Link
                     href="/agenda"
