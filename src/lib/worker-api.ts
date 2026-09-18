@@ -176,6 +176,11 @@ export interface WorkerComboLine {
   servicePrice: number | null
 }
 
+export interface WorkerClasificacion {
+  id: string
+  name: string
+}
+
 export interface WorkerCombo {
   id: string
   name: string | null
@@ -185,6 +190,13 @@ export interface WorkerCombo {
   servicesSubtotal: number
   finalAmount: number
   lines: WorkerComboLine[]
+  /** 'combo' | 'pack'. Un pack repite otro combo N veces. */
+  kind: string
+  areaCategoryId: string | null
+  /** El área: el título cuando se toca el botón "Combos". */
+  areaName: string | null
+  /** Dónde aparece dentro del árbol del menú. Puede ser más de una. */
+  clasificaciones: WorkerClasificacion[]
 }
 
 export async function fetchCombos(
@@ -193,6 +205,27 @@ export async function fetchCombos(
   return (await workerGet('/api/agenda/combos', {
     next: { revalidate: fetchOptions?.revalidate ?? 1800 },
   })) as WorkerCombo[]
+}
+
+// ─── Packs de depilación ───────────────────────────────────────────────────────
+
+export interface WorkerDepilationPack {
+  id: string
+  name: string
+  description: string | null
+  fixedPrice: number | null
+  fixedDurationMinutes: number | null
+  /** > 0 significa "elegís N zonas" además de las de `zonas`. */
+  choiceZoneCount: number
+  zonas: string[]
+}
+
+export async function fetchDepilationPacks(
+  fetchOptions?: { revalidate?: number },
+): Promise<WorkerDepilationPack[]> {
+  return (await workerGet('/api/agenda/depilacion/packs-publicos', {
+    next: { revalidate: fetchOptions?.revalidate ?? 1800 },
+  })) as WorkerDepilationPack[]
 }
 
 // ─── Capacitaciones (training) ─────────────────────────────────────────────────

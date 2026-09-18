@@ -15,6 +15,10 @@ const base: WorkerCombo = {
     { id: 'l1', serviceId: 's1', serviceName: 'Media pierna', sessionsIncluded: 8, servicePrice: 15000 },
     { id: 'l2', serviceId: 's2', serviceName: 'Axila', sessionsIncluded: 8, servicePrice: 10000 },
   ],
+  kind: 'combo',
+  areaCategoryId: 'area-1',
+  areaName: 'Depilación Definitiva',
+  clasificaciones: [{ id: 'k1', name: 'Belleza' }],
 }
 
 describe('ComboCard', () => {
