@@ -165,11 +165,20 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
           {/* Cuatro botones en dos filas. El contenedor del menú tiene alto fijo y el
               árbol es `flex-1 min-h-0`, así que esta fila de más se la come el scroll
               del árbol: el menú NO cambia de alto. */}
-          <div className="px-4 mb-2 grid grid-cols-2 gap-1.5">
+          <div
+            role="group"
+            aria-label="Filtros de catálogo — escritorio"
+            className="px-4 mb-2 grid grid-cols-2 gap-1.5"
+          >
             {BOTONES.map(({ modo: m, etiqueta, icono }) => (
               <button
                 key={m}
-                onClick={() => { setModo(modo === m ? 'arbol' : m); setQuery('') }}
+                // Comparar contra `modoEfectivo` (lo que se ve resaltado), no contra
+                // `modo` (el estado interno crudo): si compara contra `modo`, un botón
+                // que la búsqueda apagó visualmente sigue "prendido" por dentro, y
+                // tocarlo lo apaga en vez de prenderlo — la usuaria toca un botón
+                // apagado y termina en el árbol, no en el modo que tocó.
+                onClick={() => { setModo(modoEfectivo === m ? 'arbol' : m); setQuery('') }}
                 className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg font-sans text-label-sm transition-all ${
                   modoEfectivo === m
                     ? 'bg-primary text-on-primary'
@@ -388,11 +397,18 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
             {/* Cuatro botones — mismo estado `modo` que el menú de escritorio. Sin
                 esto, desde el celular (por donde entra casi toda la clientela) no
                 se llega a Combos, Packs ni Promos. */}
-            <div className="grid grid-cols-2 gap-1.5">
+            <div
+              role="group"
+              aria-label="Filtros de catálogo — drawer móvil"
+              className="grid grid-cols-2 gap-1.5"
+            >
               {BOTONES.map(({ modo: m, etiqueta, icono }) => (
                 <button
                   key={m}
-                  onClick={() => { setModo(modo === m ? 'arbol' : m); setQuery(''); closeDrawer() }}
+                  // Mismo razonamiento que en el menú de escritorio: comparar contra
+                  // `modoEfectivo`, no contra `modo`, para que el toggle haga lo que
+                  // el botón muestra (ver el comentario largo en el <aside>).
+                  onClick={() => { setModo(modoEfectivo === m ? 'arbol' : m); setQuery(''); closeDrawer() }}
                   className={`flex items-center gap-1.5 px-2.5 py-3 rounded-lg font-sans text-label-md transition-all ${
                     modoEfectivo === m
                       ? 'bg-primary text-on-primary'

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { ServiciosClient } from '@/components/servicios/servicios-client'
 import type { WorkerCombo, WorkerDepilationPack, WorkerPromotion } from '@/lib/worker-api'
@@ -75,5 +75,56 @@ describe('ServiciosClient — los cuatro botones', () => {
     montar()
     fireEvent.click(screen.getAllByRole('button', { name: 'Promos' })[0])
     expect(screen.getByText(/no hay promos vigentes/i)).toBeInTheDocument()
+  })
+
+  // Hallazgo de revisión sobre 9214cb2: el toggle decidía contra `modo` (el
+  // estado interno crudo) pero el resaltado se pintaba con `modoEfectivo` (que
+  // buscar puede pisar). Con eso, un botón que la búsqueda apaga visualmente
+  // sigue "prendido" por dentro, y tocarlo lo apagaba en vez de prenderlo.
+  it('tocar un botón apagado por la búsqueda lo prende, no lo manda al árbol', () => {
+    montar()
+    fireEvent.click(screen.getAllByRole('button', { name: 'Combos' })[0])
+    expect(screen.getByText('Combo Facial')).toBeInTheDocument()
+
+    // Buscar pisa el modo visualmente: "Combos" se ve apagado aunque por
+    // dentro `modo` siga valiendo 'combos'.
+    fireEvent.change(screen.getAllByPlaceholderText('Buscar servicio...')[0], {
+      target: { value: 'algo' },
+    })
+    expect(screen.queryByText('Combo Facial')).toBeNull()
+
+    // El botón "apagado" tiene que prender Combos de nuevo, no apagarlo más.
+    fireEvent.click(screen.getAllByRole('button', { name: 'Combos' })[0])
+    expect(screen.getByText('Combo Facial')).toBeInTheDocument()
+  })
+})
+
+// Hallazgo de revisión sobre 9214cb2: el test de arriba usa `getAllByRole(...)[0]`,
+// que siempre agarra el botón de escritorio (es el primero en el DOM) — los cuatro
+// botones del drawer móvil y su `closeDrawer()` no los probaba nadie. El drawer es
+// la mitad del rediseño que ve quien entra desde el celular, así que va aparte,
+// distinguido por el `aria-label` del grupo (más estable que un índice posicional).
+describe('ServiciosClient — el drawer móvil también tiene los cuatro botones', () => {
+  it('están los cuatro, con las mismas etiquetas', () => {
+    montar()
+    const drawer = within(screen.getByRole('group', { name: /drawer móvil/i }))
+    for (const etiqueta of ['Combos', 'Packs', 'Promos', 'Todos los servicios']) {
+      expect(drawer.getByRole('button', { name: etiqueta })).toBeInTheDocument()
+    }
+  })
+
+  it('tocar uno cambia el modo y cierra el drawer', () => {
+    const { container } = montar()
+
+    // Abrir el drawer primero: si arranca cerrado, cerrarlo de nuevo no prueba nada.
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir filtros' }))
+    const drawerPanel = container.querySelector('.rounded-t-2xl')
+    expect(drawerPanel?.className).toContain('translate-y-0')
+
+    const botonesDrawer = within(screen.getByRole('group', { name: /drawer móvil/i }))
+    fireEvent.click(botonesDrawer.getByRole('button', { name: 'Packs' }))
+
+    expect(screen.getByText('Cuerpo Full')).toBeInTheDocument()
+    expect(drawerPanel?.className).toContain('translate-y-full')
   })
 })
