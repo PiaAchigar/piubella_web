@@ -1,47 +1,44 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+
+// `TreatmentSearchSection` hace su propia búsqueda contra el Worker; acá sólo
+// interesa que la home la monte en su lugar.
+vi.mock('@/components/home/treatment-search-section', () => ({
+  TreatmentSearchSection: () => <div data-testid="buscador-de-tratamientos" />,
+}))
+
 import Home from '@/app/page'
 
-// PAUSADO hasta el rediseño de Servicios (ver PENDIENTES.md → "La página de
-// Servicios: combos y packs por clasificación").
-//
-// El `render(await Home())` de abajo ya es correcto: Home es un Server
-// Component async y antes se le pasaba a React 18 una promesa. Lo que sigue sin
-// dar son las afirmaciones: estos tests describen la home vieja —servicios
-// hardcodeados como "Depilación Láser", testimonios de ejemplo, un CTA que ya
-// no se llama así—. Reescribirlas contra la home actual sería tirar el trabajo
-// dos veces, porque el rediseño saca los combos de Destacados y cambia las
-// cards. Se reescriben junto con esa tarea.
-describe.skip('Home Page', () => {
-  it('renders hero section with title', async () => {
+describe('/', () => {
+  it('muestra el título principal', async () => {
     render(await Home())
-    expect(screen.getByText(/PiuBella/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /cuidado integral para tu cuerpo, mente y alma/i }),
+    ).toBeInTheDocument()
   })
 
-  it('renders services section', async () => {
+  it('invita a contar el objetivo y monta el buscador de tratamientos', async () => {
     render(await Home())
-    expect(screen.getByText(/Servicios Destacados/i)).toBeInTheDocument()
+    expect(screen.getByText(/contanos cuál es tu objetivo/i)).toBeInTheDocument()
+    expect(screen.getByTestId('buscador-de-tratamientos')).toBeInTheDocument()
   })
 
-  it('renders service cards', async () => {
+  it('tiene la sección de nosotros', async () => {
     render(await Home())
-    expect(screen.getByText('Depilación Láser')).toBeInTheDocument()
-    expect(screen.getByText('Masaje Relajante')).toBeInTheDocument()
-    expect(screen.getByText('Facial Premium')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /un espacio diseñado para tu bienestar absoluto/i }),
+    ).toBeInTheDocument()
   })
 
-  it('renders testimonials section', async () => {
+  it('tiene el encabezado de servicios destacados aunque no haya ninguno', async () => {
     render(await Home())
-    expect(screen.getByText(/Testimoni/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /nuestros servicios destacados/i }),
+    ).toBeInTheDocument()
   })
 
-  it('renders customer testimonials', async () => {
+  it('muestra el testimonio', async () => {
     render(await Home())
-    expect(screen.getByText('María González')).toBeInTheDocument()
-  })
-
-  it('renders call to action button', async () => {
-    render(await Home())
-    expect(screen.getByRole('link', { name: /Agendar una cita/i })).toBeInTheDocument()
+    expect(screen.getByText(/mi momento de pausa y reconexión diaria/i)).toBeInTheDocument()
   })
 })
