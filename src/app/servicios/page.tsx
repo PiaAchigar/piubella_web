@@ -1,4 +1,16 @@
-import { fetchActivities, fetchCategoryTree, fetchServices, fetchTrainings, WorkerCategory } from '@/lib/worker-api'
+import {
+  fetchActivities,
+  fetchCategoryTree,
+  fetchCombos,
+  fetchDepilationPacks,
+  fetchPromotions,
+  fetchServices,
+  fetchTrainings,
+  WorkerCategory,
+  WorkerCombo,
+  WorkerDepilationPack,
+  WorkerPromotion,
+} from '@/lib/worker-api'
 import { Activity, Service, Training } from '@/types'
 import { CategoryNode } from '@/components/servicios/types'
 import { ServiciosClient } from '@/components/servicios/servicios-client'
@@ -67,11 +79,24 @@ export default async function Servicios() {
   // Actividades (Pilates, Thermobike) viven en su propia tabla, no en `service`;
   // si el Worker no responde, /servicios igual renderiza sin esta sección.
   const activities = await fetchActivities().catch(() => [] as Activity[])
+  const [combos, packs, promos] = await Promise.all([
+    fetchCombos().catch(() => [] as WorkerCombo[]),
+    fetchDepilationPacks().catch(() => [] as WorkerDepilationPack[]),
+    fetchPromotions().catch(() => [] as WorkerPromotion[]),
+  ])
   return (
     <>
       <PromosHero />
       <CombosSection />
-      <ServiciosClient tree={tree} allServices={allServices} trainings={trainings} activities={activities} />
+      <ServiciosClient
+        tree={tree}
+        allServices={allServices}
+        trainings={trainings}
+        activities={activities}
+        combos={combos}
+        packs={packs}
+        promos={promos}
+      />
     </>
   )
 }

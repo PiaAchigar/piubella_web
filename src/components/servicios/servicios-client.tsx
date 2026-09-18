@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Activity, Service, Training } from '@/types'
 import { CategoryNode } from './types'
@@ -9,12 +9,62 @@ import { ServiceCard } from './service-card'
 import { ActivityCard } from './activity-card'
 import { TrainingCard } from '@/components/capacitaciones/training-card'
 import { TrainingJsonLd } from '@/components/capacitaciones/capacitaciones-section'
+import { BOTONES, type ModoCatalogo } from './modo-catalogo'
+import { agruparPorArea, type Grupo } from '@/lib/agrupar-catalogo'
+import { ComboCard } from './combo-card'
+import { PackCard } from './pack-card'
+import { PromoCard } from './promo-card'
+import type { WorkerCombo, WorkerDepilationPack, WorkerPromotion } from '@/lib/worker-api'
 
 interface Props {
   tree: CategoryNode[]
   allServices: Service[]
   trainings: Training[]
   activities: Activity[]
+  combos: WorkerCombo[]
+  packs: WorkerDepilationPack[]
+  promos: WorkerPromotion[]
+}
+
+/**
+ * Una lista agrupada con el área como título.
+ *
+ * Las tres pantallas de botón tienen la misma forma, así que comparten
+ * componente: si divergieran, el día que cambie el título cambiarían dos de
+ * tres. El estado vacío es obligatorio y lleva texto — en producción los
+ * combos y packs arrancan sin publicar, y una pantalla en blanco se lee como
+ * que la página está rota.
+ */
+function ListaPorArea<T extends { id: string }>({
+  grupos,
+  vacio,
+  render,
+}: {
+  grupos: Grupo<T>[]
+  vacio: string
+  render: (item: T) => ReactNode
+}) {
+  const hayAlgo = grupos.some((g) => g.items.length > 0)
+  if (!hayAlgo) {
+    return <p className="font-sans text-body-md text-on-surface-variant">{vacio}</p>
+  }
+
+  return (
+    <div className="space-y-16">
+      {grupos
+        .filter((g) => g.items.length > 0)
+        .map((g) => (
+          <div key={g.areaName}>
+            <h2 className="font-serif text-display-lg-mobile text-on-surface border-b border-outline-variant/30 pb-4 mb-8">
+              {g.areaName}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {g.items.map(render)}
+            </div>
+          </div>
+        ))}
+    </div>
+  )
 }
 
 // Renderiza una sección de categoría recursivamente con niveles de heading apropiados
@@ -60,15 +110,17 @@ function CategorySection({ node, depth }: { node: CategoryNode; depth: number })
   )
 }
 
-export function ServiciosClient({ tree, allServices, trainings, activities }: Props) {
+export function ServiciosClient({ tree, allServices, trainings, activities, combos, packs, promos }: Props) {
   const [query, setQuery] = useState('')
-  const [showAll, setShowAll] = useState(false)
+  const [modo, setModo] = useState<ModoCatalogo>('arbol')
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const closeDrawer = () => setDrawerOpen(false)
 
   const isSearching = query.trim().length > 0
-  const showFlat = showAll || isSearching
+  // Buscar pisa cualquier modo: se está buscando un servicio, no mirando una lista.
+  const modoEfectivo: ModoCatalogo = isSearching ? 'todos' : modo
+  const showFlat = modoEfectivo === 'todos'
 
   const displayedServices = useMemo(() => {
     if (!isSearching) return allServices
@@ -98,10 +150,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities }: Pr
               <input
                 type="text"
                 value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value)
-                  if (e.target.value.trim()) setShowAll(false)
-                }}
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar servicio..."
                 className="bg-transparent font-sans text-label-md text-on-surface placeholder:text-on-surface-variant outline-none w-full"
               />
@@ -113,23 +162,33 @@ export function ServiciosClient({ tree, allServices, trainings, activities }: Pr
             </div>
           </div>
 
-          {/* Botón "Todos los servicios" */}
-          <div className="px-4 mb-2">
-            <button
-              onClick={() => { setShowAll(!showAll); setQuery('') }}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg font-sans text-label-md transition-all ${
-                showAll && !isSearching
-                  ? 'bg-primary text-on-primary'
-                  : 'text-on-surface-variant hover:bg-surface-variant/50'
-              }`}
-            >
-              <span className="material-symbols-outlined text-base">apps</span>
-              Todos los servicios
-            </button>
+          {/* Cuatro botones en dos filas. El contenedor del menú tiene alto fijo y el
+              árbol es `flex-1 min-h-0`, así que esta fila de más se la come el scroll
+              del árbol: el menú NO cambia de alto. */}
+          <div className="px-4 mb-2 grid grid-cols-2 gap-1.5">
+            {BOTONES.map(({ modo: m, etiqueta, icono }) => (
+              <button
+                key={m}
+                onClick={() => { setModo(modo === m ? 'arbol' : m); setQuery('') }}
+                className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg font-sans text-label-sm transition-all ${
+                  modoEfectivo === m
+                    ? 'bg-primary text-on-primary'
+                    : 'text-on-surface-variant hover:bg-surface-variant/50'
+                }`}
+              >
+                {/* `aria-hidden` no es decorativo: sin esto el nombre accesible del botón
+                    sería "style Combos" (el ligature del ícono entra como texto) y
+                    `getByRole('button', { name: 'Combos' })` no lo encuentra. */}
+                <span aria-hidden="true" className="material-symbols-outlined text-base flex-shrink-0">
+                  {icono}
+                </span>
+                <span className="truncate">{etiqueta}</span>
+              </button>
+            ))}
           </div>
 
           {/* Nav por categorías — solo en modo categorías */}
-          {!showFlat && (
+          {modoEfectivo === 'arbol' && (
             <>
               {/* Divisor fijo — h-0.5 = 2px de alto */}
               <div className="h-0.5 bg-outline-variant/30 mx-4 flex-shrink-0" />
@@ -187,7 +246,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities }: Pr
         )}
 
         {/* Vista por categorías — árbol recursivo */}
-        {!showFlat && (
+        {modoEfectivo === 'arbol' && (
           <div className="space-y-16">
             {tree.map((node) => (
               <div key={node.id}>
@@ -237,6 +296,30 @@ export function ServiciosClient({ tree, allServices, trainings, activities }: Pr
               </div>
             )}
           </div>
+        )}
+
+        {modoEfectivo === 'combos' && (
+          <ListaPorArea
+            grupos={agruparPorArea(combos)}
+            vacio="Todavía no hay combos publicados en la web."
+            render={(c) => <ComboCard key={c.id} combo={c} variante="claro" />}
+          />
+        )}
+
+        {modoEfectivo === 'packs' && (
+          <ListaPorArea
+            grupos={[{ areaName: 'Depilación Definitiva', items: packs }]}
+            vacio="Todavía no hay packs publicados en la web."
+            render={(p) => <PackCard key={p.id} pack={p} />}
+          />
+        )}
+
+        {modoEfectivo === 'promos' && (
+          <ListaPorArea
+            grupos={[{ areaName: 'Promos', items: promos }]}
+            vacio="No hay promos vigentes en este momento."
+            render={(p) => <PromoCard key={p.id} promo={p} variante="claro" />}
+          />
         )}
       </section>
 
@@ -291,10 +374,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities }: Pr
               <input
                 type="text"
                 value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value)
-                  if (e.target.value.trim()) setShowAll(false)
-                }}
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar servicio..."
                 className="bg-transparent font-sans text-body-md text-on-surface placeholder:text-on-surface-variant outline-none w-full"
               />
@@ -305,18 +385,27 @@ export function ServiciosClient({ tree, allServices, trainings, activities }: Pr
               )}
             </div>
 
-            {/* Botón "Todos" */}
-            <button
-              onClick={() => { setShowAll(!showAll); setQuery(''); closeDrawer() }}
-              className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg font-sans text-label-md transition-all ${
-                showAll && !query.trim()
-                  ? 'bg-primary text-on-primary'
-                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
-              }`}
-            >
-              <span className="material-symbols-outlined text-base">apps</span>
-              Todos los servicios
-            </button>
+            {/* Cuatro botones — mismo estado `modo` que el menú de escritorio. Sin
+                esto, desde el celular (por donde entra casi toda la clientela) no
+                se llega a Combos, Packs ni Promos. */}
+            <div className="grid grid-cols-2 gap-1.5">
+              {BOTONES.map(({ modo: m, etiqueta, icono }) => (
+                <button
+                  key={m}
+                  onClick={() => { setModo(modo === m ? 'arbol' : m); setQuery(''); closeDrawer() }}
+                  className={`flex items-center gap-1.5 px-2.5 py-3 rounded-lg font-sans text-label-md transition-all ${
+                    modoEfectivo === m
+                      ? 'bg-primary text-on-primary'
+                      : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
+                  }`}
+                >
+                  <span aria-hidden="true" className="material-symbols-outlined text-base flex-shrink-0">
+                    {icono}
+                  </span>
+                  <span className="truncate">{etiqueta}</span>
+                </button>
+              ))}
+            </div>
 
             {/* Divisor */}
             <div className="h-0.5 bg-outline-variant/30 mx-1" />
