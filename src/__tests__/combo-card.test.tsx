@@ -22,6 +22,21 @@ const base: WorkerCombo = {
 }
 
 describe('ComboCard', () => {
+  it('lleva la pastilla "Combo"', () => {
+    render(<ComboCard combo={base} />)
+    expect(screen.getByText('Combo')).toBeInTheDocument()
+  })
+
+  it('en variante clara el título usa el color de superficie', () => {
+    const { container } = render(<ComboCard combo={base} variante="claro" />)
+    expect(container.querySelector('h3')).toHaveClass('text-on-surface')
+  })
+
+  it('en variante oscura sigue siendo la del carrusel: ancho fijo', () => {
+    const { container } = render(<ComboCard combo={base} />)
+    expect(container.firstChild).toHaveClass('w-72')
+  })
+
   it('muestra el nombre y el precio final', () => {
     render(<ComboCard combo={base} />)
     expect(screen.getByText('Depilación cuerpo completo')).toBeInTheDocument()
