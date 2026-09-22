@@ -14,6 +14,7 @@ import {
 import { Activity, Service, Training } from '@/types'
 import { CategoryNode } from '@/components/servicios/types'
 import { ServiciosClient } from '@/components/servicios/servicios-client'
+import { siFalla } from '@/lib/si-falla'
 import { PromosHero } from '@/components/servicios/promos-hero'
 
 // Las categorías de eje `area` (Estética, Medicina y Dermatología, Masajes y
@@ -44,15 +45,13 @@ async function buildNode(cat: WorkerCategory): Promise<CategoryNode> {
   }
 }
 
-async function getCategoryTree(): Promise<CategoryNode[]> {
-  try {
+function getCategoryTree(): Promise<CategoryNode[]> {
+  return siFalla('el árbol de categorías', async () => {
     const tree = await fetchCategoryTree()
     const visibleRoots = tree.filter(esVisibleEnLaWeb)
     const nodes = await Promise.all(visibleRoots.map((c) => buildNode(c)))
     return nodes.filter((n) => n.services.length > 0 || n.children.length > 0)
-  } catch {
-    return []
-  }
+  }, [])
 }
 
 // Aplana el árbol completo eliminando duplicados por id (un servicio puede estar en varias categorías)
@@ -74,14 +73,14 @@ function flattenUnique(nodes: CategoryNode[]): Service[] {
 export default async function Servicios() {
   const tree = await getCategoryTree()
   const allServices = flattenUnique(tree)
-  const trainings = await fetchTrainings().catch(() => [] as Training[])
+  const trainings = await siFalla<Training[]>('las capacitaciones', fetchTrainings, [])
   // Actividades (Pilates, Thermobike) viven en su propia tabla, no en `service`;
   // si el Worker no responde, /servicios igual renderiza sin esta sección.
-  const activities = await fetchActivities().catch(() => [] as Activity[])
+  const activities = await siFalla<Activity[]>('las actividades', fetchActivities, [])
   const [combos, packs, promos] = await Promise.all([
-    fetchCombos().catch(() => [] as WorkerCombo[]),
-    fetchDepilationPacks().catch(() => [] as WorkerDepilationPack[]),
-    fetchPromotions().catch(() => [] as WorkerPromotion[]),
+    siFalla<WorkerCombo[]>('los combos', fetchCombos, []),
+    siFalla<WorkerDepilationPack[]>('los packs de depilación', fetchDepilationPacks, []),
+    siFalla<WorkerPromotion[]>('las promos', fetchPromotions, []),
   ])
   return (
     <>

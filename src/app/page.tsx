@@ -7,6 +7,7 @@ import { PromoCarousel } from '@/components/servicios/promo-carousel'
 import { CapacitacionesSection } from '@/components/capacitaciones/capacitaciones-section'
 import { TreatmentSearchSection } from '@/components/home/treatment-search-section'
 import { FeaturedServiceCard } from '@/components/home/featured-service-card'
+import { siFalla } from '@/lib/si-falla'
 
 const NOSOTROS_IMG_1 =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCpvQE7n_ihNG9PSVU5xhch2Q88-og7-yOKkScggtZ8toZR8Py1fEUUIGw4EaazAaBWK88PxZ8G_R519MVhx_U88nYXW5lMBctDxrjaVmtjZJYGpEUyS6vnIqmAasi9lLqOJYR_R3dIXhBEueacPUkBvh-NeSWGUXjAGSHZ8PfzvqA3Z0ps_a9VNqF1Nsj5Izp-Fh-yvE_IrQNIsuSiwEuvXNfHGeP_ILiueYsq2XnkgFoAA-U4ZsdqbiN_AfU0E2yfBrNUb3HBHS16'
@@ -15,28 +16,16 @@ const NOSOTROS_IMG_2 =
 const TESTIMONIAL_AVATAR =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBYBZVjQK9PmhvNphQliDEme6jW1EdSZGLwyFliHo2_YspPIrIDZrLet61utyM4YiUOpkF-c4DPcVXUo5zTwoubQecWU_ZBRi7_TV8j-bFphMjRq6vtR_bCuXXF1YR8BrMJystGWtAkt22n4gai_uihAK_sEeSEOsL1ZM0ya8ASCE50HojY1jnVFESfZApP0oVBqFci0hno3ndlktYaTR60J00d2rBcA7LxIgCledygxdk2EB2rAXQAcq_z62DNSw7o5_h5g2_56U0X'
 
-async function getFeaturedServices(): Promise<Service[]> {
-  try {
-    return await fetchServices({ featured: true })
-  } catch {
-    return []
-  }
+function getFeaturedServices(): Promise<Service[]> {
+  return siFalla('los servicios destacados', () => fetchServices({ featured: true }), [])
 }
 
-async function getFeaturedPromos(): Promise<WorkerPromotion[]> {
-  try {
-    return await fetchPromotions({ featured: true })
-  } catch {
-    return []
-  }
+function getFeaturedPromos(): Promise<WorkerPromotion[]> {
+  return siFalla('las promos destacadas', () => fetchPromotions({ featured: true }), [])
 }
 
-async function getFeaturedTrainings(): Promise<Training[]> {
-  try {
-    return await fetchTrainings({ featured: true })
-  } catch {
-    return []
-  }
+function getFeaturedTrainings(): Promise<Training[]> {
+  return siFalla('las capacitaciones destacadas', () => fetchTrainings({ featured: true }), [])
 }
 
 export default async function Home() {

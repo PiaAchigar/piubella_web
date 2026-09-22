@@ -1,12 +1,14 @@
 import { fetchCompanyConfig } from '@/lib/worker-api'
+import { siFalla } from '@/lib/si-falla'
 
-async function getWhatsApp(): Promise<string> {
-  try {
-    const config = await fetchCompanyConfig()
-    return config.whatsapp ?? '5491133775014'
-  } catch {
-    return '5491133775014'
-  }
+const WHATSAPP_DE_RESPALDO = '5491133775014'
+
+function getWhatsApp(): Promise<string> {
+  return siFalla(
+    'la configuración de la empresa',
+    async () => (await fetchCompanyConfig()).whatsapp ?? WHATSAPP_DE_RESPALDO,
+    WHATSAPP_DE_RESPALDO,
+  )
 }
 
 export async function WhatsAppFab() {

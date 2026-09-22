@@ -1,14 +1,13 @@
 import { fetchPromotions } from '@/lib/worker-api'
+import { siFalla } from '@/lib/si-falla'
 import { PromoCarousel } from './promo-carousel'
 
 export async function PromosHero() {
-  let promos = []
-  try {
-    promos = await fetchPromotions()
-  } catch {
-    return null
-  }
+  const promos = await siFalla('las promos de la franja', fetchPromotions, [])
 
+  // Sin promos no hay franja: la clienta no tiene por qué ver un cartel que le
+  // explique nuestra gestión interna. Vale tanto si no hay ninguna publicada
+  // como si el Worker no contestó — pero ahora el segundo caso queda en el log.
   if (promos.length === 0) return null
 
   return (

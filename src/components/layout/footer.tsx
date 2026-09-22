@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { fetchCompanyConfig, WorkerCompanyConfig } from '@/lib/worker-api'
+import { siFalla } from '@/lib/si-falla'
 
 const LEGAL_LINKS = [
   { label: 'Política de Privacidad', href: '/privacidad' },
@@ -7,12 +8,8 @@ const LEGAL_LINKS = [
   { label: 'Cookies', href: '/cookies' },
 ]
 
-async function getConfig(): Promise<WorkerCompanyConfig | null> {
-  try {
-    return await fetchCompanyConfig()
-  } catch {
-    return null
-  }
+function getConfig(): Promise<WorkerCompanyConfig | null> {
+  return siFalla('la configuración de la empresa', fetchCompanyConfig, null)
 }
 
 export async function Footer() {
