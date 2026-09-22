@@ -9,7 +9,7 @@ import { ServiceCard } from './service-card'
 import { ActivityCard } from './activity-card'
 import { TrainingCard } from '@/components/capacitaciones/training-card'
 import { TrainingJsonLd } from '@/components/capacitaciones/capacitaciones-section'
-import { BOTONES, type ModoCatalogo } from './modo-catalogo'
+import { botonesVisibles, type ModoCatalogo } from './modo-catalogo'
 import { agruparPorArea, combosDeClasificacion, type Grupo } from '@/lib/agrupar-catalogo'
 import { ComboCard } from './combo-card'
 import { PackCard } from './pack-card'
@@ -37,17 +37,19 @@ interface Props {
  */
 function ListaPorArea<T extends { id: string }>({
   grupos,
-  vacio,
   render,
 }: {
   grupos: Grupo<T>[]
-  vacio: string
   render: (item: T) => ReactNode
 }) {
+  // Sin cartel de "todavía no hay nada publicado": eso era una explicación de
+  // nuestra gestión interna metida en una página que lee una clienta. Ahora el
+  // botón directamente no existe cuando no hay nada detrás (ver
+  // `botonesVisibles`), así que a este estado no se llega — y si se llegara,
+  // mejor no dibujar nada que explicarle a la clienta cómo administramos el
+  // catálogo.
   const hayAlgo = grupos.some((g) => g.items.length > 0)
-  if (!hayAlgo) {
-    return <p className="font-sans text-body-md text-on-surface-variant">{vacio}</p>
-  }
+  if (!hayAlgo) return null
 
   return (
     <div className="space-y-16">
@@ -108,18 +110,22 @@ function CategorySection({
     <div id={`cat-${node.id}`} className="scroll-mt-[110px]">
       {headingEl}
 
-      {node.services.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          {node.services.map((service) => (
-            <ServiceCard key={service.id} service={service} />
-          ))}
-        </div>
-      )}
-
+      {/* Los combos van ARRIBA de los servicios sueltos, no abajo: son la
+          oferta armada de esa clasificación —varios servicios a un precio
+          mejor— y quien entra a "Belleza" tiene que verlos antes de ponerse a
+          comparar servicios de a uno. Abajo del todo se los perdería. */}
       {misCombos.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {misCombos.map((c) => (
             <ComboCard key={c.id} combo={c} variante="claro" />
+          ))}
+        </div>
+      )}
+
+      {node.services.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {node.services.map((service) => (
+            <ServiceCard key={service.id} service={service} />
           ))}
         </div>
       )}
@@ -138,6 +144,31 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
 
   const closeDrawer = () => setDrawerOpen(false)
 
+  /**
+   * Tocar una categoría del menú lleva al catálogo y baja hasta ella.
+   *
+   * Las categorías se ven SIEMPRE, también mientras se mira Combos o Packs:
+   * esconderlas dejaba a la clienta sin forma de volver salvo recargando la
+   * página. Como el panel puede estar mostrando otra cosa, el ancla `#cat-…`
+   * todavía no existe al momento del click, así que el scroll espera al frame
+   * siguiente — cuando React ya dibujó el árbol.
+   */
+  function irACategoria(id: string) {
+    setModo('arbol')
+    setQuery('')
+    requestAnimationFrame(() => {
+      document.getElementById(`cat-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
+  // Un botón que lleva a una lista vacía es una puerta a una pantalla en
+  // blanco. Si no hay nada publicado, no hay botón.
+  const botones = botonesVisibles({
+    combos: combos.length > 0,
+    packs: packs.length > 0,
+    promos: promos.length > 0,
+  })
+
   const isSearching = query.trim().length > 0
   // Buscar pisa cualquier modo: se está buscando un servicio, no mirando una lista.
   const modoEfectivo: ModoCatalogo = isSearching ? 'todos' : modo
@@ -154,10 +185,10 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
   }, [query, allServices, isSearching])
 
   return (
-    <main className="max-w-container mx-auto flex flex-col md:flex-row px-gutter py-12 gap-12">
+    <main className="max-w-catalogo mx-auto flex flex-col md:flex-row px-gutter py-12 gap-12">
 
       {/* Sidebar */}
-      <aside className="hidden md:block w-64 flex-shrink-0">
+      <aside className="hidden md:block w-80 flex-shrink-0">
         <div className="sticky top-[100px] h-[calc(100vh-120px)] flex flex-col py-8 bg-surface-container-low rounded-r-xl elegant-shadow">
           <div className="px-6 mb-4">
             <h2 className="font-serif text-headline-sm text-primary">Servicios</h2>
@@ -191,7 +222,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
             aria-label="Filtros de catálogo — escritorio"
             className="px-4 mb-2 grid grid-cols-2 gap-1.5"
           >
-            {BOTONES.map(({ modo: m, etiqueta, icono }) => (
+            {botones.map(({ modo: m, etiqueta, icono }) => (
               <button
                 key={m}
                 // Comparar contra `modoEfectivo` (lo que se ve resaltado), no contra
@@ -217,17 +248,20 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
             ))}
           </div>
 
-          {/* Nav por categorías — solo en modo categorías */}
-          {modoEfectivo === 'arbol' && (
-            <>
-              {/* Divisor fijo — h-0.5 = 2px de alto */}
-              <div className="h-0.5 bg-outline-variant/30 mx-4 flex-shrink-0" />
-              {/* Área scrolleable — flex-1 + min-h-0 para que el flex no rompa el scroll */}
-              <div className="flex-1 min-h-0 overflow-y-auto sidebar-scroll">
-                <SidebarNav tree={tree} hasTrainings={trainings.length > 0} hasActivities={activities.length > 0} />
-              </div>
-            </>
-          )}
+          {/* Las categorías se ven SIEMPRE, no sólo en modo árbol. Antes
+              desaparecían al tocar Combos/Packs/Promos y no había forma de
+              recuperarlas salvo recargando la página. */}
+          {/* Divisor fijo — h-0.5 = 2px de alto */}
+          <div className="h-0.5 bg-outline-variant/30 mx-4 flex-shrink-0" />
+          {/* Área scrolleable — flex-1 + min-h-0 para que el flex no rompa el scroll */}
+          <div className="flex-1 min-h-0 overflow-y-auto sidebar-scroll">
+            <SidebarNav
+              tree={tree}
+              hasTrainings={trainings.length > 0}
+              hasActivities={activities.length > 0}
+              onLinkClick={irACategoria}
+            />
+          </div>
 
           <div className="mt-auto px-6 pt-4 border-t border-outline-variant/30">
             <Link
@@ -331,7 +365,6 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
         {modoEfectivo === 'combos' && (
           <ListaPorArea
             grupos={agruparPorArea(combos)}
-            vacio="Todavía no hay combos publicados en la web."
             render={(c) => <ComboCard key={c.id} combo={c} variante="claro" />}
           />
         )}
@@ -339,7 +372,6 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
         {modoEfectivo === 'packs' && (
           <ListaPorArea
             grupos={[{ areaName: 'Depilación Definitiva', items: packs }]}
-            vacio="Todavía no hay packs publicados en la web."
             render={(p) => <PackCard key={p.id} pack={p} />}
           />
         )}
@@ -347,7 +379,6 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
         {modoEfectivo === 'promos' && (
           <ListaPorArea
             grupos={[{ areaName: 'Promos', items: promos }]}
-            vacio="No hay promos vigentes en este momento."
             render={(p) => <PromoCard key={p.id} promo={p} variante="claro" />}
           />
         )}
@@ -423,7 +454,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
               aria-label="Filtros de catálogo — drawer móvil"
               className="grid grid-cols-2 gap-1.5"
             >
-              {BOTONES.map(({ modo: m, etiqueta, icono }) => (
+              {botones.map(({ modo: m, etiqueta, icono }) => (
                 <button
                   key={m}
                   // Mismo razonamiento que en el menú de escritorio: comparar contra
@@ -448,7 +479,18 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
             <div className="h-0.5 bg-outline-variant/30 mx-1" />
 
             {/* Nav de categorías */}
-            <SidebarNav tree={tree} hasTrainings={trainings.length > 0} hasActivities={activities.length > 0} onLinkClick={closeDrawer} />
+            {/* En el drawer, tocar una categoría además lo cierra: si no, la
+                clienta queda mirando el menú tapando el contenido al que
+                acaba de pedir ir. */}
+            <SidebarNav
+              tree={tree}
+              hasTrainings={trainings.length > 0}
+              hasActivities={activities.length > 0}
+              onLinkClick={(id) => {
+                closeDrawer()
+                irACategoria(id)
+              }}
+            />
 
             {/* Espacio al final para que no quede pegado al borde */}
             <div className="h-4" />

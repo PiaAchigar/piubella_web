@@ -10,6 +10,12 @@ const combo: WorkerCombo = {
   clasificaciones: [{ id: 'k1', name: 'Belleza' }],
 }
 
+const promo: WorkerPromotion = {
+  id: 'pr1', name: 'Promo Primavera', description: null,
+  promotionType: 'percentage', discountPercentage: 20, discountAmount: null,
+  validFrom: null, validUntil: null, targets: [],
+}
+
 const pack: WorkerDepilationPack = {
   id: 'p1', name: 'Cuerpo Full', description: null, fixedPrice: 65000,
   fixedDurationMinutes: 90, choiceZoneCount: 0, zonas: ['Axilas'],
@@ -24,7 +30,7 @@ function montar(over: Partial<Parameters<typeof ServiciosClient>[0]> = {}) {
       activities={[]}
       combos={[combo]}
       packs={[pack]}
-      promos={[] as WorkerPromotion[]}
+      promos={[promo]}
       {...over}
     />,
   )
@@ -33,7 +39,7 @@ function montar(over: Partial<Parameters<typeof ServiciosClient>[0]> = {}) {
 describe('ServiciosClient — los cuatro botones', () => {
   it('los cuatro están en el menú', () => {
     montar()
-    for (const etiqueta of ['Combos', 'Packs', 'Promos', 'Todos los servicios']) {
+    for (const etiqueta of ['Combos', 'Packs', 'Promos', 'Todo']) {
       expect(screen.getAllByRole('button', { name: etiqueta }).length).toBeGreaterThan(0)
     }
   })
@@ -59,22 +65,47 @@ describe('ServiciosClient — los cuatro botones', () => {
     expect(screen.getByText('Cuerpo Full')).toBeInTheDocument()
   })
 
-  it('sin combos publicados explica por qué, no deja la pantalla en blanco', () => {
+  // Un botón que lleva a una lista vacía es una puerta a una pantalla en
+  // blanco. Antes ahí salía "todavía no hay combos publicados", que es una
+  // explicación de nuestra gestión interna leída por una clienta. Ahora el
+  // botón directamente no está.
+  it('sin combos publicados no hay botón "Combos"', () => {
     montar({ combos: [] })
-    fireEvent.click(screen.getAllByRole('button', { name: 'Combos' })[0])
-    expect(screen.getByText(/todavía no hay combos publicados/i)).toBeInTheDocument()
+    expect(screen.queryAllByRole('button', { name: 'Combos' })).toHaveLength(0)
   })
 
-  it('sin packs publicados explica por qué', () => {
+  it('sin packs publicados no hay botón "Packs"', () => {
     montar({ packs: [] })
-    fireEvent.click(screen.getAllByRole('button', { name: 'Packs' })[0])
-    expect(screen.getByText(/todavía no hay packs publicados/i)).toBeInTheDocument()
+    expect(screen.queryAllByRole('button', { name: 'Packs' })).toHaveLength(0)
   })
 
-  it('sin promos vigentes explica por qué', () => {
-    montar()
-    fireEvent.click(screen.getAllByRole('button', { name: 'Promos' })[0])
-    expect(screen.getByText(/no hay promos vigentes/i)).toBeInTheDocument()
+  it('sin promos vigentes no hay botón "Promos"', () => {
+    montar({ promos: [] })
+    expect(screen.queryAllByRole('button', { name: 'Promos' })).toHaveLength(0)
+  })
+
+  it('"Todo" queda siempre, aunque no haya nada más publicado', () => {
+    montar({ combos: [], packs: [] })
+    expect(screen.queryAllByRole('button', { name: 'Combos' })).toHaveLength(0)
+    expect(screen.queryAllByRole('button', { name: 'Packs' })).toHaveLength(0)
+    expect(screen.getAllByRole('button', { name: 'Todo' }).length).toBeGreaterThan(0)
+  })
+
+  it('las categorías NO desaparecen al tocar un botón', () => {
+    montar({ tree: [{ id: 'k1', name: 'Belleza', services: [], children: [] }] })
+    fireEvent.click(screen.getAllByRole('button', { name: 'Combos' })[0])
+    // Antes el árbol se escondía al entrar en un modo y no había forma de
+    // recuperarlo sin recargar la página.
+    expect(screen.getAllByRole('link', { name: 'Belleza' }).length).toBeGreaterThan(0)
+  })
+
+  it('tocar una categoría apaga el botón activo y vuelve al catálogo', () => {
+    montar({ tree: [{ id: 'k1', name: 'Belleza', services: [], children: [] }] })
+    fireEvent.click(screen.getAllByRole('button', { name: 'Combos' })[0])
+    fireEvent.click(screen.getAllByRole('link', { name: 'Belleza' })[0])
+    // El combo de la prueba es del área Estética: si volvió al catálogo por
+    // categorías, ese encabezado de área ya no está.
+    expect(screen.queryByRole('heading', { name: 'Estética' })).toBeNull()
   })
 
   // Hallazgo de revisión sobre 9214cb2: el toggle decidía contra `modo` (el
@@ -133,7 +164,7 @@ describe('ServiciosClient — el drawer móvil también tiene los cuatro botones
   it('están los cuatro, con las mismas etiquetas', () => {
     montar()
     const drawer = within(screen.getByRole('group', { name: /drawer móvil/i }))
-    for (const etiqueta of ['Combos', 'Packs', 'Promos', 'Todos los servicios']) {
+    for (const etiqueta of ['Combos', 'Packs', 'Promos', 'Todo']) {
       expect(drawer.getByRole('button', { name: etiqueta })).toBeInTheDocument()
     }
   })

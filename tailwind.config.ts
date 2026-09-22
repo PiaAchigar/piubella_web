@@ -97,7 +97,14 @@ const config: Config = {
         'margin-mobile': '20px',
       },
       maxWidth: {
+        /* Las páginas de TEXTO (nosotros, contacto, legales) se quedan acá: una
+           línea de más de ~75 caracteres se lee peor, y ensancharlas sería
+           empeorarlas. */
         'container': '1200px',
+        /* El CATÁLOGO sí gana con el ancho, porque son cards en grilla, no
+           prosa. 1400 es el mismo ancho que ya usaba la franja de Promos de
+           /servicios, así que los bordes de las dos alinean. */
+        'catalogo': '1400px',
       },
       padding: {
         'section-lg': '120px',

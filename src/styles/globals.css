@@ -80,27 +80,46 @@
     @apply h-px bg-outline-variant my-section-lg;
   }
 
-  /* Scrollbar del panel lateral de servicios */
-  .sidebar-scroll {
+  /* El scroll de TODA la web, con el mismo estilo que el dashboard.
+     Antes sólo lo tenía el menú lateral de servicios, así que la barra
+     principal de la página se veía con el gris ancho del navegador — que es lo
+     que se notaba feo, no el menú. */
+  html,
+  .sidebar-scroll,
+  .modal-scroll {
     scrollbar-width: thin;
     scrollbar-color: #A16D47 transparent;
   }
 
-  .sidebar-scroll::-webkit-scrollbar {
+  /* 4px alcanza para un panel chico, donde la barra es casi decorativa. Para
+     la barra PRINCIPAL de la página no: 4px es un blanco imposible de agarrar
+     con el mouse. Va a 8px, que sigue siendo fina pero se puede arrastrar. */
+  html::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar,
+  .modal-scroll::-webkit-scrollbar {
     width: 4px;
   }
 
-  .sidebar-scroll::-webkit-scrollbar-track {
+  html::-webkit-scrollbar-track,
+  .sidebar-scroll::-webkit-scrollbar-track,
+  .modal-scroll::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  .sidebar-scroll::-webkit-scrollbar-thumb {
+  html::-webkit-scrollbar-thumb,
+  .sidebar-scroll::-webkit-scrollbar-thumb,
+  .modal-scroll::-webkit-scrollbar-thumb {
     background-color: #A16D47;
     border-radius: 9999px;
   }
 
   /* Oculta las flechas de los extremos del scroll */
-  .sidebar-scroll::-webkit-scrollbar-button {
+  html::-webkit-scrollbar-button,
+  .sidebar-scroll::-webkit-scrollbar-button,
+  .modal-scroll::-webkit-scrollbar-button {
     display: none;
   }
 }

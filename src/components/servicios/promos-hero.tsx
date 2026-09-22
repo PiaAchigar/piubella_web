@@ -13,7 +13,7 @@ export async function PromosHero() {
 
   return (
     <section className="bg-primary overflow-hidden">
-      <div className="max-w-[1400px] mx-auto px-gutter py-section-md">
+      <div className="max-w-catalogo mx-auto px-gutter py-section-md">
         <div className="mb-10">
           <span className="mt-10 font-sans text-label-md text-on-primary/60 tracking-widest uppercase block">
             Ofertas especiales

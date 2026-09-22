@@ -23,12 +23,17 @@ describe('/servicios', () => {
     expect(screen.getByTestId('promos-hero')).toBeInTheDocument()
   })
 
-  it('muestra los cuatro botones del menú', async () => {
+  it('sin Worker sólo queda el botón "Todo": los otros tres no tienen nada detrás', async () => {
     render(await Servicios())
-    // Los cuatro botones están duplicados: una copia en el aside de escritorio
-    // y otra en el drawer móvil, así que hay que buscar todas las coincidencias.
-    for (const etiqueta of ['Combos', 'Packs', 'Promos', 'Todos los servicios']) {
-      expect(screen.getAllByRole('button', { name: etiqueta }).length).toBeGreaterThan(0)
+    // Sin Worker, combos/packs/promos caen a listas vacías, y un botón que
+    // lleva a una lista vacía es una puerta a una pantalla en blanco: no se
+    // dibuja. "Todo" sí, porque servicios siempre hay.
+    //
+    // Los botones están duplicados —una copia en el aside de escritorio y otra
+    // en el drawer móvil— así que se buscan todas las coincidencias.
+    expect(screen.getAllByRole('button', { name: 'Todo' }).length).toBeGreaterThan(0)
+    for (const etiqueta of ['Combos', 'Packs', 'Promos']) {
+      expect(screen.queryAllByRole('button', { name: etiqueta })).toHaveLength(0)
     }
   })
 

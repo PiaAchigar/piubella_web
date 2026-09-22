@@ -8,7 +8,8 @@ interface NavItemProps {
   depth: number
   openIds: Set<string>
   toggle: (id: string) => void
-  onLinkClick?: () => void
+  /** Recibe el id del nodo: quien lo maneja tiene que saber a dónde llevar. */
+  onLinkClick?: (id: string) => void
 }
 
 function NavItem({ node, depth, openIds, toggle, onLinkClick }: NavItemProps) {
@@ -31,7 +32,15 @@ function NavItem({ node, depth, openIds, toggle, onLinkClick }: NavItemProps) {
 
         <a
           href={`#cat-${node.id}`}
-          onClick={onLinkClick}
+          // El salto nativo del navegador no sirve acá: si el panel está
+          // mostrando Combos, el ancla `#cat-…` todavía no existe en el DOM y
+          // el click no haría nada. Quien maneja el click cambia de modo y
+          // recién después baja, cuando React ya dibujó el árbol.
+          onClick={(e) => {
+            if (!onLinkClick) return
+            e.preventDefault()
+            onLinkClick(node.id)
+          }}
           className={`flex-1 py-2 text-on-surface-variant hover:text-primary transition-colors ${
             depth === 0 ? 'font-sans text-label-sm' : 'font-sans text-body-md'
           }`}
@@ -82,7 +91,7 @@ export function SidebarNav({
   tree: CategoryNode[]
   hasTrainings?: boolean
   hasActivities?: boolean
-  onLinkClick?: () => void
+  onLinkClick?: (id: string) => void
 }) {
   const [openIds, setOpenIds] = useState<Set<string>>(new Set())
 
@@ -112,7 +121,11 @@ export function SidebarNav({
           <span className="material-symbols-outlined text-outline text-base flex-shrink-0">fitness_center</span>
           <a
             href="#cat-actividades"
-            onClick={onLinkClick}
+            onClick={(e) => {
+              if (!onLinkClick) return
+              e.preventDefault()
+              onLinkClick('actividades')
+            }}
             className="flex-1 py-2 text-on-surface-variant hover:text-primary transition-colors font-sans text-label-sm"
           >
             Actividades
@@ -126,7 +139,11 @@ export function SidebarNav({
           <span className="material-symbols-outlined text-outline text-base flex-shrink-0">school</span>
           <a
             href="#cat-capacitaciones"
-            onClick={onLinkClick}
+            onClick={(e) => {
+              if (!onLinkClick) return
+              e.preventDefault()
+              onLinkClick('capacitaciones')
+            }}
             className="flex-1 py-2 text-on-surface-variant hover:text-primary transition-colors font-sans text-label-sm"
           >
             Capacitaciones
