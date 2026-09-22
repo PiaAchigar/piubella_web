@@ -114,10 +114,11 @@ export default function ContactoPage() {
                 <form className="space-y-8" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <label className="block font-sans text-label-md text-on-surface-variant uppercase">
+                      <label htmlFor="contacto-nombre" className="block font-sans text-label-md text-on-surface-variant uppercase">
                         Nombre
                       </label>
                       <input
+                        id="contacto-nombre"
                         name="name"
                         type="text"
                         required
@@ -126,10 +127,11 @@ export default function ContactoPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="block font-sans text-label-md text-on-surface-variant uppercase">
+                      <label htmlFor="contacto-mail" className="block font-sans text-label-md text-on-surface-variant uppercase">
                         Mail
                       </label>
                       <input
+                        id="contacto-mail"
                         name="email"
                         type="email"
                         required
@@ -139,10 +141,11 @@ export default function ContactoPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="block font-sans text-label-md text-on-surface-variant uppercase">
+                    <label htmlFor="contacto-whatsapp" className="block font-sans text-label-md text-on-surface-variant uppercase">
                       WhatsApp
                     </label>
                     <input
+                      id="contacto-whatsapp"
                       name="phone"
                       type="tel"
                       placeholder="+54 11 ..."
@@ -150,10 +153,11 @@ export default function ContactoPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block font-sans text-label-md text-on-surface-variant uppercase">
+                    <label htmlFor="contacto-consulta" className="block font-sans text-label-md text-on-surface-variant uppercase">
                       Consulta
                     </label>
                     <textarea
+                      id="contacto-consulta"
                       name="message"
                       required
                       rows={4}

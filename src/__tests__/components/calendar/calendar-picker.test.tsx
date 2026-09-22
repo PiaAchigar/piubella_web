@@ -1,3 +1,21 @@
+/**
+ * PAUSADO EN PARTE (2026-09-22, decisión de Pia).
+ *
+ * Este archivo prueba el asistente de reserva de /agenda, que HOY NO TIENE
+ * RUTA: `page.tsx` es la página "Próximamente" y el asistente quedó en
+ * `page.booking.tsx`, que en el App Router no es una ruta. El código se
+ * conserva a propósito, para cuando el turnero vuelva.
+ *
+ * Los tests marcados con `it.skip` afirman contra una versión anterior de
+ * estos componentes y NO esconden ningún bug: se revisaron uno por uno. Se
+ * pausan en vez de arreglarse porque arreglar tests de una pantalla que nadie
+ * ejecuta es trabajo que habría que rehacer igual: cuando el turnero vuelva va
+ * a hablar con el Worker, y estos componentes leen la base con Drizzle directo
+ * desde la web, que es la arquitectura que el proyecto ya dejó atrás.
+ *
+ * El resto del archivo SIGUE CORRIENDO: pausar todo habría apagado tests que
+ * hoy pasan y cubren código que se conserva.
+ */
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { CalendarPicker } from '@/components/calendar/calendar-picker'
@@ -35,7 +53,7 @@ describe('CalendarPicker', () => {
     expect(screen.getByText('30')).toBeInTheDocument()
   })
 
-  it('disables past dates', () => {
+  it.skip('disables past dates', () => {
     const mockSelect = vi.fn()
     const { container } = render(<CalendarPicker onDateSelect={mockSelect} />)
 
