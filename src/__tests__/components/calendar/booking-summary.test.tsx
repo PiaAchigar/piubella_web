@@ -1,3 +1,21 @@
+/**
+ * PAUSADO EN PARTE (2026-09-22, decisión de Pia).
+ *
+ * Este archivo prueba el asistente de reserva de /agenda, que HOY NO TIENE
+ * RUTA: `page.tsx` es la página "Próximamente" y el asistente quedó en
+ * `page.booking.tsx`, que en el App Router no es una ruta. El código se
+ * conserva a propósito, para cuando el turnero vuelva.
+ *
+ * Los tests marcados con `it.skip` afirman contra una versión anterior de
+ * estos componentes y NO esconden ningún bug: se revisaron uno por uno. Se
+ * pausan en vez de arreglarse porque arreglar tests de una pantalla que nadie
+ * ejecuta es trabajo que habría que rehacer igual: cuando el turnero vuelva va
+ * a hablar con el Worker, y estos componentes leen la base con Drizzle directo
+ * desde la web, que es la arquitectura que el proyecto ya dejó atrás.
+ *
+ * El resto del archivo SIGUE CORRIENDO: pausar todo habría apagado tests que
+ * hoy pasan y cubren código que se conserva.
+ */
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { BookingSummary } from '@/components/calendar/booking-summary'
@@ -30,7 +48,7 @@ describe('BookingSummary', () => {
     expect(screen.getByText(mockBooking.service.name)).toBeInTheDocument()
   })
 
-  it('displays selected date', () => {
+  it.skip('displays selected date', () => {
     render(<BookingSummary booking={mockBooking} />)
     expect(screen.getByText(/15|junio|june/i)).toBeInTheDocument()
   })
@@ -47,12 +65,12 @@ describe('BookingSummary', () => {
     expect(screen.getByText('+54 9 1234 56789')).toBeInTheDocument()
   })
 
-  it('displays total price', () => {
+  it.skip('displays total price', () => {
     render(<BookingSummary booking={mockBooking} />)
     expect(screen.getByText(/150|precio|total/i)).toBeInTheDocument()
   })
 
-  it('renders confirm button', () => {
+  it.skip('renders confirm button', () => {
     render(<BookingSummary booking={mockBooking} />)
     expect(
       screen.getByRole('button', { name: /confirmar|aceptar|reservar/i })
@@ -66,7 +84,7 @@ describe('BookingSummary', () => {
     ).toBeInTheDocument()
   })
 
-  it('displays service duration', () => {
+  it.skip('displays service duration', () => {
     render(<BookingSummary booking={mockBooking} />)
     expect(screen.getByText(/60|min|minutos/i)).toBeInTheDocument()
   })

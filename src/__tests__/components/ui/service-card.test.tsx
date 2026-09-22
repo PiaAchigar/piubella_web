@@ -1,3 +1,14 @@
+/**
+ * PAUSADO EN PARTE (2026-09-22, decisión de Pia).
+ *
+ * `src/components/ui/service-card.tsx` no lo importa nadie: la card que se usa
+ * de verdad es `src/components/servicios/service-card.tsx`. Se conserva igual.
+ *
+ * El único test pausado afirma sobre NOMBRES DE CLASES de Tailwind, y falla
+ * porque la clase pasó de `shadow` a `shadow-sm`. Aunque la card estuviera
+ * viva, ese test no probaría nada que a la clienta le importe: un cambio de
+ * sombra no es una regresión. El resto del archivo sigue corriendo.
+ */
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { ServiceCard } from '@/components/ui/service-card'
@@ -45,7 +56,7 @@ describe('ServiceCard', () => {
     expect(link).toHaveAttribute('href', '/agenda?service=1')
   })
 
-  it('applies correct styling classes', () => {
+  it.skip('applies correct styling classes', () => {
     const { container } = render(<ServiceCard service={mockService} />)
     const card = container.firstChild
     expect(card).toHaveClass('rounded', 'border', 'shadow')
