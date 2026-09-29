@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { SearchOfferCard, esCombo, type SearchOffer } from './search-offer-card'
@@ -45,6 +45,19 @@ export function TreatmentSearchSection() {
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const resultadosRef = useRef<HTMLDivElement>(null)
+
+  // Los resultados se dibujan bastante más abajo del borde inferior de la
+  // pantalla: en 1280x720 el primero arranca ~230px fuera de vista. Sin esto,
+  // quien busca aprieta BUSCAR, no ve que cambie nada y concluye que el
+  // buscador no anda (Pia, 2026-09-29, verificado contra producción).
+  //
+  // Va en un efecto y no adentro de `handleSearch` porque ahí el nodo todavía
+  // no existe: React lo monta recién en el render que dispara `setResults`.
+  useEffect(() => {
+    if (!results) return
+    resultadosRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [results])
 
   // Hay algo que limpiar si quedó texto escrito o si ya se buscó alguna vez.
   // El botón no se muestra antes de eso: un control que no hace nada distrae.
@@ -134,7 +147,9 @@ export function TreatmentSearchSection() {
 
         {/* Results */}
         {hasSearched && results && (
-          <div>
+          // `scroll-mt-24` deja aire arriba al traerlos a la vista: pegados al
+          // borde el encabezado queda debajo del menú fijo.
+          <div ref={resultadosRef} className="scroll-mt-24">
             {/* Treatments */}
             {results.treatments.length > 0 ? (
               <div className="mb-16">
