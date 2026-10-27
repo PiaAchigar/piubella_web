@@ -184,3 +184,46 @@ describe('ServiciosClient — el drawer móvil también tiene los cuatro botones
     expect(drawerPanel?.className).toContain('translate-y-full')
   })
 })
+
+// Pedido de Pia (2026-10-27): Depilación Definitiva es un ÁREA, no una
+// clasificación, así que nunca entraba en el árbol del menú. Ahora va como una
+// categoría más —igual que Actividades y Capacitaciones— con lo publicado de
+// depilación: los packs y los combos de esa área.
+describe('ServiciosClient — Depilación Definitiva en el menú', () => {
+  const comboDepi: WorkerCombo = {
+    ...combo, id: 'c2', name: 'Combo Piernas + Axilas',
+    areaCategoryId: 'a2', areaName: 'Depilación Definitiva', clasificaciones: [],
+  }
+
+  it('con un pack publicado aparece en el menú como categoría', () => {
+    montar()
+    expect(screen.getAllByRole('link', { name: 'Depilación Definitiva' }).length).toBeGreaterThan(0)
+  })
+
+  it('su sección del catálogo muestra los packs', () => {
+    montar()
+    const seccion = screen.getByRole('heading', { name: 'Depilación Definitiva' }).parentElement!
+    expect(within(seccion).getByText('Cuerpo Full')).toBeTruthy()
+  })
+
+  it('un combo del área Depilación Definitiva también entra en la sección', () => {
+    montar({ combos: [combo, comboDepi] })
+    const seccion = screen.getByRole('heading', { name: 'Depilación Definitiva' }).parentElement!
+    expect(within(seccion).getByText('Combo Piernas + Axilas')).toBeTruthy()
+    // Un combo de otra área no se cuela.
+    expect(within(seccion).queryByText('Combo Facial')).toBeNull()
+  })
+
+  it('sin nada de depilación publicado no aparece: sería una puerta a una sección vacía', () => {
+    montar({ packs: [] })
+    expect(screen.queryByRole('link', { name: 'Depilación Definitiva' })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Depilación Definitiva' })).toBeNull()
+  })
+
+  it('tocarla en el menú vuelve al catálogo aunque se esté mirando Combos', () => {
+    montar()
+    fireEvent.click(screen.getAllByRole('button', { name: 'Combos' })[0])
+    fireEvent.click(screen.getAllByRole('link', { name: 'Depilación Definitiva' })[0])
+    expect(screen.getByRole('heading', { name: 'Depilación Definitiva' })).toBeTruthy()
+  })
+})

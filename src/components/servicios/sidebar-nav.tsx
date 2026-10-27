@@ -86,11 +86,14 @@ export function SidebarNav({
   tree,
   hasTrainings = false,
   hasActivities = false,
+  hasDepilacion = false,
   onLinkClick,
 }: {
   tree: CategoryNode[]
   hasTrainings?: boolean
   hasActivities?: boolean
+  /** Hay algo de depilación publicado (packs o combos de esa área). */
+  hasDepilacion?: boolean
   onLinkClick?: (id: string) => void
 }) {
   const [openIds, setOpenIds] = useState<Set<string>>(new Set())
@@ -114,6 +117,26 @@ export function SidebarNav({
           onLinkClick={onLinkClick}
         />
       ))}
+
+      {/* Depilación Definitiva — es un ÁREA, no una clasificación, así que no
+          viene en el árbol. Se comporta como una categoría más, igual que
+          Actividades, y lleva a la sección de sus packs y combos. */}
+      {hasDepilacion && (
+        <div className="flex items-center gap-1 my-0.5 mx-2 rounded-lg hover:bg-surface-variant/50 transition-all" style={{ paddingLeft: '8px' }}>
+          <span className="material-symbols-outlined text-outline text-base flex-shrink-0">spa</span>
+          <a
+            href="#cat-depilacion"
+            onClick={(e) => {
+              if (!onLinkClick) return
+              e.preventDefault()
+              onLinkClick('depilacion')
+            }}
+            className="flex-1 py-2 text-on-surface-variant hover:text-primary transition-colors font-sans text-label-sm"
+          >
+            Depilación Definitiva
+          </a>
+        </div>
+      )}
 
       {/* Actividades — se comporta como una categoría más (ancla a su sección) */}
       {hasActivities && (

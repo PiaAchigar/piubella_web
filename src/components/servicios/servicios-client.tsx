@@ -16,6 +16,9 @@ import { PackCard } from './pack-card'
 import { PromoCard } from './promo-card'
 import type { WorkerCombo, WorkerDepilationPack, WorkerPromotion } from '@/lib/worker-api'
 
+/** El área de la depilación, tal como se llama en `categories` (kind area). */
+const AREA_DEPILACION = 'Depilación Definitiva'
+
 interface Props {
   tree: CategoryNode[]
   allServices: Service[]
@@ -169,6 +172,15 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
     promos: promos.length > 0,
   })
 
+  // Depilación Definitiva entra al menú como una categoría más (pedido de Pia,
+  // 2026-10-27): sus packs y los combos de esa área. Es un área, no una
+  // clasificación, así que el árbol no la trae.
+  const combosDeDepilacion = useMemo(
+    () => combos.filter((c) => c.areaName === AREA_DEPILACION),
+    [combos],
+  )
+  const hayDepilacion = packs.length > 0 || combosDeDepilacion.length > 0
+
   const isSearching = query.trim().length > 0
   // Buscar pisa cualquier modo: se está buscando un servicio, no mirando una lista.
   const modoEfectivo: ModoCatalogo = isSearching ? 'todos' : modo
@@ -259,6 +271,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
               tree={tree}
               hasTrainings={trainings.length > 0}
               hasActivities={activities.length > 0}
+              hasDepilacion={hayDepilacion}
               onLinkClick={irACategoria}
             />
           </div>
@@ -331,6 +344,23 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
               </p>
             )}
 
+            {/* Depilación Definitiva — packs y combos de esa área, no del árbol */}
+            {hayDepilacion && (
+              <div id="cat-depilacion" className="scroll-mt-[110px]">
+                <h2 className="font-serif text-display-lg-mobile text-on-surface border-b border-outline-variant/30 pb-4 mb-8">
+                  {AREA_DEPILACION}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {packs.map((p) => (
+                    <PackCard key={p.id} pack={p} />
+                  ))}
+                  {combosDeDepilacion.map((c) => (
+                    <ComboCard key={c.id} combo={c} variante="claro" />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Actividades — vienen de `activities`, no del árbol de categorías */}
             {activities.length > 0 && (
               <div id="cat-actividades" className="scroll-mt-[110px]">
@@ -371,7 +401,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
 
         {modoEfectivo === 'packs' && (
           <ListaPorArea
-            grupos={[{ areaName: 'Depilación Definitiva', items: packs }]}
+            grupos={[{ areaName: AREA_DEPILACION, items: packs }]}
             render={(p) => <PackCard key={p.id} pack={p} />}
           />
         )}
@@ -486,6 +516,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
               tree={tree}
               hasTrainings={trainings.length > 0}
               hasActivities={activities.length > 0}
+              hasDepilacion={hayDepilacion}
               onLinkClick={(id) => {
                 closeDrawer()
                 irACategoria(id)
