@@ -12,3 +12,14 @@ export async function workerGet(path: string, fetchOptions?: NextFetchOptions): 
   }
   return res.json()
 }
+
+/** POST al Worker. Devuelve la respuesta cruda: quien llama decide qué hacer
+ *  con un 4xx (por ejemplo, pasárselo al navegador tal cual). */
+export function workerPost(path: string, body: unknown): Promise<Response> {
+  return fetch(`${WORKER_BASE_URL}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    cache: 'no-store',
+  })
+}

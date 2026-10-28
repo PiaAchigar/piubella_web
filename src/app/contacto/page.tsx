@@ -5,19 +5,35 @@ import Image from 'next/image'
 import { enlaceDeWhatsApp, WHATSAPP_DEL_LOCAL } from '@/lib/whatsapp'
 
 export default function ContactoPage() {
-  const [submitted, setSubmitted] = useState(false)
+  // Hasta el 2026-10-28 esto hacía console.log y decía "enviado": las
+  // consultas se perdían. Ahora van al Inbox del CRM (vía /api/contacto).
+  const [estado, setEstado] = useState<'listo' | 'enviando' | 'enviado' | 'error'>('listo')
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    console.log('Contact form submitted:', {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      message: formData.get('message'),
-    })
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 3000)
+    if (estado === 'enviando') return
+    const form = e.currentTarget
+    const datos = new FormData(form)
+    setEstado('enviando')
+    try {
+      const res = await fetch('/api/contacto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: datos.get('name'),
+          email: datos.get('email'),
+          telefono: datos.get('phone'),
+          mensaje: datos.get('message'),
+          empresa: datos.get('empresa') ?? '',
+        }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      form.reset()
+      setEstado('enviado')
+    } catch {
+      // Lo escrito queda en el formulario: puede reintentar o copiarlo a WhatsApp.
+      setEstado('error')
+    }
   }
 
   const channels = [
@@ -107,12 +123,31 @@ export default function ContactoPage() {
 
             <div className="lg:col-span-7">
               <div className="bg-surface p-8 md:p-12 rounded-2xl elegant-shadow border border-surface-variant/50">
-                {submitted && (
-                  <div className="mb-8 p-4 bg-primary-container text-on-primary-container rounded-lg font-sans text-body-md">
-                    ¡Gracias por tu mensaje! Nos pondremos en contacto pronto.
+                {estado === 'enviado' && (
+                  <div role="status" className="mb-8 p-4 bg-primary-container text-on-primary-container rounded-lg font-sans text-body-md">
+                    ¡Gracias por tu mensaje! Te respondemos a la brevedad.
+                  </div>
+                )}
+                {estado === 'error' && (
+                  <div role="alert" className="mb-8 p-4 bg-error-container text-on-error-container rounded-lg font-sans text-body-md">
+                    No pudimos enviar tu consulta. Probá de nuevo en un rato, o{' '}
+                    <a
+                      href={enlaceDeWhatsApp(WHATSAPP_DEL_LOCAL)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline font-medium"
+                    >
+                      escribinos por WhatsApp
+                    </a>
+                    .
                   </div>
                 )}
                 <form className="space-y-8" onSubmit={handleSubmit}>
+                  {/* Campo trampa: una persona no lo ve y lo deja vacío; un bot lo llena. */}
+                  <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                    <label htmlFor="contacto-empresa">Empresa</label>
+                    <input id="contacto-empresa" name="empresa" type="text" tabIndex={-1} autoComplete="off" />
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
                       <label htmlFor="contacto-nombre" className="block font-sans text-label-md text-on-surface-variant uppercase">
@@ -149,6 +184,7 @@ export default function ContactoPage() {
                       id="contacto-whatsapp"
                       name="phone"
                       type="tel"
+                      required
                       placeholder="+54 11 ..."
                       className="w-full bg-surface-container-low border-none rounded-lg px-4 py-4 focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-outline-variant font-sans text-body-md"
                     />
@@ -168,9 +204,10 @@ export default function ContactoPage() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-primary text-on-primary py-4 rounded-lg font-sans text-label-md hover:bg-primary/90 transition-colors uppercase tracking-widest shadow-lg shadow-primary/20"
+                    disabled={estado === 'enviando'}
+                    className="w-full bg-primary text-on-primary py-4 rounded-lg font-sans text-label-md hover:bg-primary/90 transition-colors uppercase tracking-widest shadow-lg shadow-primary/20 disabled:opacity-60 disabled:cursor-wait"
                   >
-                    Enviar Mensaje
+                    {estado === 'enviando' ? 'Enviando…' : 'Enviar Mensaje'}
                   </button>
                 </form>
               </div>
