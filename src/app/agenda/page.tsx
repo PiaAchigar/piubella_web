@@ -1,14 +1,13 @@
 import Link from 'next/link'
 import { fetchCompanyConfig } from '@/lib/worker-api'
 import { siFalla } from '@/lib/si-falla'
-
-const WHATSAPP_DE_RESPALDO = '5491133775014'
+import { enlaceDeWhatsApp, WHATSAPP_DEL_LOCAL } from '@/lib/whatsapp'
 
 function getWhatsApp(): Promise<string> {
   return siFalla(
     'la configuración de la empresa',
-    async () => (await fetchCompanyConfig()).whatsapp ?? WHATSAPP_DE_RESPALDO,
-    WHATSAPP_DE_RESPALDO,
+    async () => (await fetchCompanyConfig()).whatsapp ?? WHATSAPP_DEL_LOCAL,
+    WHATSAPP_DEL_LOCAL,
   )
 }
 
@@ -33,7 +32,7 @@ export default async function AgendaProximamente() {
         </div>
 
         <Link
-          href={`https://wa.me/${whatsapp}`}
+          href={enlaceDeWhatsApp(whatsapp)}
           target="_blank"
           className="inline-flex items-center gap-3 bg-primary text-on-primary px-8 py-4 rounded-lg font-sans text-label-md tracking-widest uppercase hover:opacity-90 transition-all"
         >

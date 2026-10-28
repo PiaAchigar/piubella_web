@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { fetchCompanyConfig, WorkerCompanyConfig } from '@/lib/worker-api'
 import { siFalla } from '@/lib/si-falla'
+import { enlaceDeWhatsApp } from '@/lib/whatsapp'
 
 const LEGAL_LINKS = [
   { label: 'Política de Privacidad', href: '/privacidad' },
@@ -16,9 +17,7 @@ export async function Footer() {
   const config = await getConfig()
   const year = new Date().getFullYear()
 
-  const whatsappHref = config?.whatsapp
-    ? `https://wa.me/${config.whatsapp}`
-    : 'https://wa.me/5491133775014'
+  const whatsappHref = enlaceDeWhatsApp(config?.whatsapp)
 
   const emailHref = config?.email
     ? `mailto:${config.email}`

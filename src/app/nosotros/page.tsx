@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { enlaceDeWhatsApp, WHATSAPP_DEL_LOCAL } from '@/lib/whatsapp'
 
 export default function Nosotros() {
   // const partnerLogos = [
@@ -25,7 +26,7 @@ export default function Nosotros() {
       src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDkAlUAgEFToMbHxJkxyt7q0N9QbKEmp6O_KVcIsmi2FX80ir2MFfTy78c5fCK61P2kr7DExVj4Xik-Fh1SY8l65vR_KNhgoisVItQ7_mlhXKEQEIlxgjfi63VSylh1qPyC3ZmJPHRZAteWeElvE2lPqAEDl7v5q3wSkW6wSo4YQRFT_2fn86dOmnQ9Sjc0MGBAXcnlbdzA0hJP_ghlIrom__AhG_YY_SGLUJRr2Rk4noFM6CGFs-o4na5JJGGV6Jrqgi8FrNjp8fsw',
       icon: 'chat',
       name:"WhatsApp",
-      http:"https://wa.me/00541133775014"
+      http: enlaceDeWhatsApp(WHATSAPP_DEL_LOCAL)
     },
     {
       src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAJPLlIKhBpT2JlaORkKAzf4x95OA0oK8ESkX5y7vvykuUm4fJaiwUVTcEU10j9kR-0NgD9qSitzmp_UXFsaaWc9DyhcGtU7Dy_DW_XEmFqk-HkUli8gyt6gH8bFslxxzLo_P1sSL3uuJBaIERA0_mxsC5W8OV0cIHx0It5Fl3fT7T7JT37HQKRuwW5IZsIJfDhf_tjSPHbCYah2wJiJe8p8xxtI0nLGdUYeGu9h4vLLg5wpjp2ZvrgYnVKKTWdgMSG7VlmnE2wRu3A',

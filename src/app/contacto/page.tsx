@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { enlaceDeWhatsApp, WHATSAPP_DEL_LOCAL } from '@/lib/whatsapp'
 
 export default function ContactoPage() {
   const [submitted, setSubmitted] = useState(false)
@@ -20,7 +21,7 @@ export default function ContactoPage() {
   }
 
   const channels = [
-    { icon: 'chat', label: 'WhatsApp', value: '+54 9 11 3377 5014', href: 'https://wa.me/00541133775014' },
+    { icon: 'chat', label: 'WhatsApp', value: '+54 9 11 3377 5014', href: enlaceDeWhatsApp(WHATSAPP_DEL_LOCAL) },
     { icon: 'photo_camera', label: 'Instagram', value: '@piubellaesteticapilates', href: 'https://www.instagram.com/piubellaesteticapilates/' },
     { icon: 'social_leaderboard', label: 'Facebook', value: 'Piu Bella Estetica Pilates', href: 'https://www.facebook.com/piubellaesteticagym' },
     { icon: 'mail', label: 'Email', value: 'info@piubellaesteticapilates.com.ar', href: 'mailto:info@piubellaesteticapilates.com.ar' },

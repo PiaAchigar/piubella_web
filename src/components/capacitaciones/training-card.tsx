@@ -1,12 +1,11 @@
 import { Training } from '@/types'
+import { enlaceDeWhatsApp, WHATSAPP_DEL_LOCAL } from '@/lib/whatsapp'
 
 const MODALITY_LABELS: Record<string, string> = {
   in_person: 'Presencial',
   online: 'Online',
   hybrid: 'Híbrida',
 }
-
-const WHATSAPP_BASE = 'https://wa.me/00541133775014'
 
 function priceAR(value: number | null): string | null {
   if (value == null) return null
@@ -32,8 +31,7 @@ export function TrainingCard({ training }: { training: Training }) {
     meta.push(`cupo ${training.maxParticipants}`)
   }
 
-  const waMessage = encodeURIComponent(`Hola! Quiero más información sobre la capacitación "${training.name ?? ''}".`)
-  const waHref = `${WHATSAPP_BASE}?text=${waMessage}`
+  const waHref = enlaceDeWhatsApp(WHATSAPP_DEL_LOCAL, `Hola! Quiero más información sobre la capacitación "${training.name ?? ''}".`)
 
   return (
     <div className="asymmetric-item group">

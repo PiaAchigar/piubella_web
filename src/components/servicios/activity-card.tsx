@@ -1,12 +1,11 @@
 import { Activity } from '@/types'
+import { enlaceDeWhatsApp, WHATSAPP_DEL_LOCAL } from '@/lib/whatsapp'
 
 // Mismas etiquetas de modalidad que training-card, pero para el eje class/machine.
 const ACTIVITY_TYPE_LABELS: Record<string, string> = {
   class: 'Clase grupal',
   machine: 'Aparatología',
 }
-
-const WHATSAPP_BASE = 'https://wa.me/00541133775014'
 
 function priceAR(value: string | null): string | null {
   if (value == null) return null
@@ -37,8 +36,7 @@ export function ActivityCard({ activity }: { activity: Activity }) {
     meta.push(`${activity.classesPerMonth} ${activity.classesPerMonth === 1 ? 'clase' : 'clases'} por mes`)
   }
 
-  const waMessage = encodeURIComponent(`Hola! Quiero más información sobre la actividad "${activityName}".`)
-  const waHref = `${WHATSAPP_BASE}?text=${waMessage}`
+  const waHref = enlaceDeWhatsApp(WHATSAPP_DEL_LOCAL, `Hola! Quiero más información sobre la actividad "${activityName}".`)
 
   return (
     <div className="asymmetric-item group">

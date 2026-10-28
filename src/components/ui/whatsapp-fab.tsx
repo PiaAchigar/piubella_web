@@ -1,13 +1,12 @@
 import { fetchCompanyConfig } from '@/lib/worker-api'
 import { siFalla } from '@/lib/si-falla'
-
-const WHATSAPP_DE_RESPALDO = '5491133775014'
+import { enlaceDeWhatsApp, WHATSAPP_DEL_LOCAL } from '@/lib/whatsapp'
 
 function getWhatsApp(): Promise<string> {
   return siFalla(
     'la configuración de la empresa',
-    async () => (await fetchCompanyConfig()).whatsapp ?? WHATSAPP_DE_RESPALDO,
-    WHATSAPP_DE_RESPALDO,
+    async () => (await fetchCompanyConfig()).whatsapp ?? WHATSAPP_DEL_LOCAL,
+    WHATSAPP_DEL_LOCAL,
   )
 }
 
@@ -16,7 +15,7 @@ export async function WhatsAppFab() {
 
   return (
     <a
-      href={`https://wa.me/${whatsapp}`}
+      href={enlaceDeWhatsApp(whatsapp)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"

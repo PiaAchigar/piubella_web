@@ -17,7 +17,7 @@ function buildCourseJsonLd(trainings: Training[]) {
         provider: {
           '@type': 'Organization',
           name: 'Piu Bella',
-          sameAs: 'https://piubella.com',
+          sameAs: 'https://www.piubellaesteticapilates.com.ar',
         },
         ...(t.listPrice != null && {
           offers: {
