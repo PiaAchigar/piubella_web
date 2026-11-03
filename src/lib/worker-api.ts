@@ -154,6 +154,9 @@ export interface WorkerPromotion {
   validFrom: string | null
   validUntil: string | null
   targets: WorkerPromotionTarget[]
+  /** Opcionales: la API vieja no los manda y la card cae al "% OFF" de siempre. */
+  sumaDeLasPartes?: number | null
+  precioFinal?: number | null
 }
 
 export async function fetchPromotions(
@@ -186,9 +189,19 @@ export interface WorkerCombo {
   name: string | null
   description: string | null
   priceType: string | null
-  validityMonths: number | null
+  /** API vieja. Si no viene `validityWeeks`, la card cae a "N meses". */
+  validityMonths?: number | null
+  /** Plazo en semanas (null = sin plazo). */
+  validityWeeks?: number | null
   servicesSubtotal: number
   finalAmount: number
+  /** Suma de lo que cuestan las partes sueltas (a precio de lista). */
+  sumaDeLasPartes?: number
+  sumaDeLasPartesEfectivo?: number
+  finalAmountCash?: number
+  /** Packs: sesiones realmente incluidas y precio de cada una. */
+  packEffectiveSessions?: number
+  packUnitAmount?: number
   lines: WorkerComboLine[]
   /** 'combo' | 'pack'. Un pack repite otro combo N veces. */
   kind: string
@@ -218,6 +231,8 @@ export interface WorkerDepilationPack {
   /** > 0 significa "elegís N zonas" además de las de `zonas`. */
   choiceZoneCount: number
   zonas: string[]
+  /** null para "elegís N zonas": no hay suma que comparar. */
+  sumaDeLasPartes?: number | null
 }
 
 export async function fetchDepilationPacks(

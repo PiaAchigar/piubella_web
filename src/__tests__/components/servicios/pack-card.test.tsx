@@ -52,4 +52,13 @@ describe('PackCard', () => {
     const { container } = render(<PackCard pack={base} />)
     expect(container.querySelector('.line-through')).toBeNull()
   })
+
+  it('pack de depilación con suma de zonas la tacha; sin suma, sólo el precio', () => {
+    const { rerender, container } = render(<PackCard pack={{ ...base, sumaDeLasPartes: 80000 }} />)
+    expect(container.querySelector('.line-through')).toHaveTextContent('$80.000')
+    expect(screen.getByText('$65.000')).toBeInTheDocument()
+    rerender(<PackCard pack={{ ...base, sumaDeLasPartes: null }} />)
+    expect(container.querySelector('.line-through')).toBeNull()
+    expect(screen.getByText('$65.000')).toBeInTheDocument()
+  })
 })

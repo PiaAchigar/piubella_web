@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { WorkerPromotion } from '@/lib/worker-api'
+import { PrecioConAhorro } from './precio-con-ahorro'
 
 /**
  * `variante` existe por el mismo motivo que en ComboCard: esta card vive en la
@@ -96,7 +97,9 @@ export function PromoCard({
           claro ? 'border-outline-variant/40' : 'border-white/20'
         }`}
       >
-        {descuento != null ? (
+        {promo.precioFinal != null ? (
+          <PrecioConAhorro suma={promo.sumaDeLasPartes} final={promo.precioFinal} claro={claro} />
+        ) : descuento != null ? (
           <span
             className={`font-serif text-headline-sm ${
               claro ? 'text-on-surface' : 'text-on-primary'

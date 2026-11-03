@@ -1,14 +1,13 @@
 import Link from 'next/link'
 import { WorkerDepilationPack } from '@/lib/worker-api'
-
-const pesos = (n: number) => `$${n.toLocaleString('es-AR')}`
+import { PrecioConAhorro } from './precio-con-ahorro'
 
 /**
  * Un pack de depilación en la web pública.
  *
- * Sin precio tachado a propósito: `depilation_combo` guarda su precio y nada
- * contra qué compararlo, y un tachado inventado es peor que ninguno. Ver el
- * spec §6.2.
+ * El tachado es la suma de las zonas sueltas (`sumaDeLasPartes`), y sólo
+ * viene cuando el pack tiene zonas fijas: en "elegís N zonas" es null y no se
+ * inventa un tachado.
  */
 export function PackCard({ pack }: { pack: WorkerDepilationPack }) {
   return (
@@ -52,9 +51,7 @@ export function PackCard({ pack }: { pack: WorkerDepilationPack }) {
 
       <div className="flex items-center justify-between pt-4 border-t border-outline-variant/40 mt-auto">
         {pack.fixedPrice != null && (
-          <span className="font-serif text-headline-sm text-on-surface">
-            {pesos(pack.fixedPrice)}
-          </span>
+          <PrecioConAhorro suma={pack.sumaDeLasPartes} final={pack.fixedPrice} claro />
         )}
         <Link
           href="/contacto"

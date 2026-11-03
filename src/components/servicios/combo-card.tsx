@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { WorkerCombo } from '@/lib/worker-api'
-
-const pesos = (n: number) => `$${n.toLocaleString('es-AR')}`
+import { PrecioConAhorro } from './precio-con-ahorro'
 
 /**
  * `variante` existe porque esta card vive en dos fondos: la franja oscura de
@@ -16,7 +15,7 @@ export function ComboCard({
   combo: WorkerCombo
   variante?: 'oscuro' | 'claro'
 }) {
-  const hayAhorro = combo.finalAmount < combo.servicesSubtotal
+  const esPack = combo.kind === 'pack'
   const claro = variante === 'claro'
 
   return (
@@ -59,19 +58,25 @@ export function ComboCard({
               >
                 check
               </span>
-              {l.sessionsIncluded} {l.sessionsIncluded === 1 ? 'sesión' : 'sesiones'} de {l.serviceName}
+              {(() => {
+                // Un pack dice las sesiones reales (puede traer regalo), no las de la receta.
+                const n = esPack && combo.packEffectiveSessions != null ? combo.packEffectiveSessions : l.sessionsIncluded
+                return `${n} ${n === 1 ? 'sesión' : 'sesiones'} de ${l.serviceName}`
+              })()}
             </li>
           ))}
         </ul>
       )}
 
-      {combo.validityMonths != null && (
+      {(combo.validityWeeks != null || (combo.validityWeeks === undefined && combo.validityMonths != null)) && (
         <p
           className={`font-sans text-body-sm ${
             claro ? 'text-on-surface-variant' : 'text-on-primary/60'
           }`}
         >
-          {combo.validityMonths} meses para usarlas
+          {combo.validityWeeks != null
+            ? `${combo.validityWeeks} semanas para usarlas`
+            : `${combo.validityMonths} meses para usarlas`}
         </p>
       )}
 
@@ -80,23 +85,13 @@ export function ComboCard({
           claro ? 'border-outline-variant/40' : 'border-white/20'
         }`}
       >
-        <div className="flex flex-col">
-          {hayAhorro && (
-            <span
-              data-testid="combo-subtotal"
-              className={`font-sans text-body-sm line-through ${
-                claro ? 'text-on-surface-variant' : 'text-on-primary/50'
-              }`}
-            >
-              {pesos(combo.servicesSubtotal)}
-            </span>
-          )}
-          <span
-            className={`font-serif text-headline-sm ${claro ? 'text-on-surface' : 'text-on-primary'}`}
-          >
-            {pesos(combo.finalAmount)}
-          </span>
-        </div>
+        <PrecioConAhorro
+          suma={combo.sumaDeLasPartes ?? combo.servicesSubtotal}
+          final={combo.finalAmount}
+          efectivo={combo.finalAmountCash}
+          claro={claro}
+          testIdSuma="combo-subtotal"
+        />
         <Link
           href="/contacto"
           className={`font-sans text-label-md underline underline-offset-4 ${
