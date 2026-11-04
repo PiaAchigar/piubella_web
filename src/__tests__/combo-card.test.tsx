@@ -62,9 +62,9 @@ describe('ComboCard', () => {
     expect(screen.queryByTestId('combo-subtotal')).toBeNull()
   })
 
-  it('muestra la vigencia en meses', () => {
-    render(<ComboCard combo={base} />)
-    expect(screen.getByText(/12 meses para usarlas/i)).toBeInTheDocument()
+  it('no muestra el plazo de uso, aunque esté cargado', () => {
+    render(<ComboCard combo={{ ...base, validityMonths: 12, validityWeeks: 26 }} />)
+    expect(screen.queryByText(/para usarlas/)).toBeNull()
   })
 
   it('usa el singular "sesión" cuando la línea incluye una sola sesión', () => {
@@ -116,13 +116,4 @@ describe('ComboCard', () => {
     expect(screen.queryByText(/Precio efectivo/)).toBeNull()
   })
 
-  it('dice N semanas para usarlas', () => {
-    render(<ComboCard combo={{ ...base, validityMonths: undefined, validityWeeks: 26 }} />)
-    expect(screen.getByText('26 semanas para usarlas')).toBeInTheDocument()
-  })
-
-  it('validityWeeks null: no muestra plazo', () => {
-    render(<ComboCard combo={{ ...base, validityMonths: undefined, validityWeeks: null }} />)
-    expect(screen.queryByText(/para usarlas/)).toBeNull()
-  })
 })

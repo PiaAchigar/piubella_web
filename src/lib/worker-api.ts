@@ -189,9 +189,8 @@ export interface WorkerCombo {
   name: string | null
   description: string | null
   priceType: string | null
-  /** API vieja. Si no viene `validityWeeks`, la card cae a "N meses". */
+  /** La API lo manda, pero la web no muestra el plazo de uso (pedido de Pia, 2026-11-04). */
   validityMonths?: number | null
-  /** Plazo en semanas (null = sin plazo). */
   validityWeeks?: number | null
   servicesSubtotal: number
   finalAmount: number

@@ -164,6 +164,20 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
     })
   }
 
+  /**
+   * Tocar un botón cambia la lista del panel, y vuelve arriba para verla.
+   *
+   * El árbol mide decenas de miles de píxeles y Combos unos dos mil. Sin esto,
+   * la página quedaba en la misma altura —o el navegador la bajaba al nuevo
+   * final— y la clienta caía en el footer sin ver lo que tocó. `instant` porque
+   * la lista ya cambió: animar el viaje no muestra nada.
+   */
+  function elegirModo(m: Exclude<ModoCatalogo, 'arbol'>) {
+    setModo(modoEfectivo === m ? 'arbol' : m)
+    setQuery('')
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+
   // Un botón que lleva a una lista vacía es una puerta a una pantalla en
   // blanco. Si no hay nada publicado, no hay botón.
   const botones = botonesVisibles({
@@ -242,7 +256,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
                 // que la búsqueda apagó visualmente sigue "prendido" por dentro, y
                 // tocarlo lo apaga en vez de prenderlo — la usuaria toca un botón
                 // apagado y termina en el árbol, no en el modo que tocó.
-                onClick={() => { setModo(modoEfectivo === m ? 'arbol' : m); setQuery('') }}
+                onClick={() => elegirModo(m)}
                 className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg font-sans text-label-sm transition-all ${
                   modoEfectivo === m
                     ? 'bg-primary text-on-primary'
@@ -490,7 +504,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
                   // Mismo razonamiento que en el menú de escritorio: comparar contra
                   // `modoEfectivo`, no contra `modo`, para que el toggle haga lo que
                   // el botón muestra (ver el comentario largo en el <aside>).
-                  onClick={() => { setModo(modoEfectivo === m ? 'arbol' : m); setQuery(''); closeDrawer() }}
+                  onClick={() => { elegirModo(m); closeDrawer() }}
                   className={`flex items-center gap-1.5 px-2.5 py-3 rounded-lg font-sans text-label-md transition-all ${
                     modoEfectivo === m
                       ? 'bg-primary text-on-primary'

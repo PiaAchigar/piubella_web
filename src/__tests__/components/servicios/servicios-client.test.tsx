@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, within } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { ServiciosClient } from '@/components/servicios/servicios-client'
 import type { WorkerCombo, WorkerDepilationPack, WorkerPromotion } from '@/lib/worker-api'
 
@@ -37,6 +37,14 @@ function montar(over: Partial<Parameters<typeof ServiciosClient>[0]> = {}) {
 }
 
 describe('ServiciosClient — los cuatro botones', () => {
+  it('tocar un botón vuelve arriba: la lista nueva es más corta y si no se ve el footer', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+    montar()
+    fireEvent.click(screen.getAllByRole('button', { name: 'Combos' })[0])
+    expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'instant' })
+    scrollTo.mockRestore()
+  })
+
   it('los cuatro están en el menú', () => {
     montar()
     for (const etiqueta of ['Combos', 'Packs', 'Promos', 'Todo']) {

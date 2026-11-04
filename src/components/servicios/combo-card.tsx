@@ -68,18 +68,6 @@ export function ComboCard({
         </ul>
       )}
 
-      {(combo.validityWeeks != null || (combo.validityWeeks === undefined && combo.validityMonths != null)) && (
-        <p
-          className={`font-sans text-body-sm ${
-            claro ? 'text-on-surface-variant' : 'text-on-primary/60'
-          }`}
-        >
-          {combo.validityWeeks != null
-            ? `${combo.validityWeeks} semanas para usarlas`
-            : `${combo.validityMonths} meses para usarlas`}
-        </p>
-      )}
-
       <div
         className={`flex items-center justify-between pt-4 border-t mt-auto ${
           claro ? 'border-outline-variant/40' : 'border-white/20'
