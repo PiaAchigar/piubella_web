@@ -242,6 +242,21 @@ export async function fetchDepilationPacks(
   })) as WorkerDepilationPack[]
 }
 
+export interface WorkerZonaDepilacion {
+  id: string
+  nombre: string
+  /** El de una zona sola, tarifa de mujer. 0 = sin tarifa cargada. */
+  precio: number
+}
+
+export async function fetchZonasDepilacion(
+  fetchOptions?: { revalidate?: number },
+): Promise<WorkerZonaDepilacion[]> {
+  return (await workerGet('/api/agenda/depilacion/zonas-publicas', {
+    next: { revalidate: fetchOptions?.revalidate ?? 1800 },
+  })) as WorkerZonaDepilacion[]
+}
+
 // ─── Capacitaciones (training) ─────────────────────────────────────────────────
 
 export interface WorkerTraining {

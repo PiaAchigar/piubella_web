@@ -235,3 +235,23 @@ describe('ServiciosClient — Depilación Definitiva en el menú', () => {
     expect(screen.getByRole('heading', { name: 'Depilación Definitiva' })).toBeTruthy()
   })
 })
+
+describe('ServiciosClient — zonas de Depilación Definitiva', () => {
+  const zonas = [{ id: 'z1', nombre: 'Axila', precio: 12000 }]
+
+  it('muestra las zonas en la sección de Depilación Definitiva', () => {
+    montar({ zonas })
+    expect(screen.getByText('Axila')).toBeInTheDocument()
+    expect(screen.getByText('$12.000')).toBeInTheDocument()
+  })
+
+  it('con zonas alcanza para que exista la categoría, aunque no haya packs ni combos', () => {
+    montar({ zonas, packs: [], combos: [] })
+    expect(screen.getAllByText('Depilación Definitiva').length).toBeGreaterThan(0)
+  })
+
+  it('sin zonas, sin packs y sin combos la categoría no aparece', () => {
+    montar({ zonas: [], packs: [], combos: [] })
+    expect(screen.queryByText('Depilación Definitiva')).not.toBeInTheDocument()
+  })
+})

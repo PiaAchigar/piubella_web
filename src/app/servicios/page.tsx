@@ -6,10 +6,12 @@ import {
   fetchPromotions,
   fetchServices,
   fetchTrainings,
+  fetchZonasDepilacion,
   WorkerCategory,
   WorkerCombo,
   WorkerDepilationPack,
   WorkerPromotion,
+  WorkerZonaDepilacion,
 } from '@/lib/worker-api'
 import { Activity, Service, Training } from '@/types'
 import { CategoryNode } from '@/components/servicios/types'
@@ -77,10 +79,11 @@ export default async function Servicios() {
   // Actividades (Pilates, Thermobike) viven en su propia tabla, no en `service`;
   // si el Worker no responde, /servicios igual renderiza sin esta sección.
   const activities = await siFalla<Activity[]>('las actividades', fetchActivities, [])
-  const [combos, packs, promos] = await Promise.all([
+  const [combos, packs, promos, zonas] = await Promise.all([
     siFalla<WorkerCombo[]>('los combos', fetchCombos, []),
     siFalla<WorkerDepilationPack[]>('los packs de depilación', fetchDepilationPacks, []),
     siFalla<WorkerPromotion[]>('las promos', fetchPromotions, []),
+    siFalla<WorkerZonaDepilacion[]>('las zonas de depilación', fetchZonasDepilacion, []),
   ])
   return (
     <>
@@ -93,6 +96,7 @@ export default async function Servicios() {
         combos={combos}
         packs={packs}
         promos={promos}
+        zonas={zonas}
       />
     </>
   )

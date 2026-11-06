@@ -13,8 +13,9 @@ import { botonesVisibles, type ModoCatalogo } from './modo-catalogo'
 import { agruparPorArea, combosDeClasificacion, type Grupo } from '@/lib/agrupar-catalogo'
 import { ComboCard } from './combo-card'
 import { PackCard } from './pack-card'
+import { ZonaCard } from './zona-card'
 import { PromoCard } from './promo-card'
-import type { WorkerCombo, WorkerDepilationPack, WorkerPromotion } from '@/lib/worker-api'
+import type { WorkerCombo, WorkerDepilationPack, WorkerPromotion, WorkerZonaDepilacion } from '@/lib/worker-api'
 
 /** El área de la depilación, tal como se llama en `categories` (kind area). */
 const AREA_DEPILACION = 'Depilación Definitiva'
@@ -27,6 +28,8 @@ interface Props {
   combos: WorkerCombo[]
   packs: WorkerDepilationPack[]
   promos: WorkerPromotion[]
+  /** Las zonas sueltas de Depilación Definitiva. */
+  zonas?: WorkerZonaDepilacion[]
 }
 
 /**
@@ -140,7 +143,7 @@ function CategorySection({
   )
 }
 
-export function ServiciosClient({ tree, allServices, trainings, activities, combos, packs, promos }: Props) {
+export function ServiciosClient({ tree, allServices, trainings, activities, combos, packs, promos, zonas = [] }: Props) {
   const [query, setQuery] = useState('')
   const [modo, setModo] = useState<ModoCatalogo>('arbol')
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -193,7 +196,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
     () => combos.filter((c) => c.areaName === AREA_DEPILACION),
     [combos],
   )
-  const hayDepilacion = packs.length > 0 || combosDeDepilacion.length > 0
+  const hayDepilacion = packs.length > 0 || combosDeDepilacion.length > 0 || zonas.length > 0
 
   const isSearching = query.trim().length > 0
   // Buscar pisa cualquier modo: se está buscando un servicio, no mirando una lista.
@@ -358,7 +361,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
               </p>
             )}
 
-            {/* Depilación Definitiva — packs y combos de esa área, no del árbol */}
+            {/* Depilación Definitiva — packs, combos y zonas de esa área, no del árbol */}
             {hayDepilacion && (
               <div id="cat-depilacion" className="scroll-mt-[110px]">
                 <h2 className="font-serif text-display-lg-mobile text-on-surface border-b border-outline-variant/30 pb-4 mb-8">
@@ -370,6 +373,9 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
                   ))}
                   {combosDeDepilacion.map((c) => (
                     <ComboCard key={c.id} combo={c} variante="claro" />
+                  ))}
+                  {zonas.map((z) => (
+                    <ZonaCard key={z.id} zona={z} />
                   ))}
                 </div>
               </div>
