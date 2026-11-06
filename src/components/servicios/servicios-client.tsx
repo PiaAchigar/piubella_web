@@ -30,6 +30,22 @@ interface Props {
   promos: WorkerPromotion[]
   /** Las zonas sueltas de Depilación Definitiva. */
   zonas?: WorkerZonaDepilacion[]
+  /** Las descripciones de las secciones que no salen del árbol. */
+  descripcionesDeSecciones?: {
+    depilacion: string | null
+    actividades: string | null
+    capacitaciones: string | null
+  }
+}
+
+/** El texto que Laura escribe para una categoría. Sin texto no dibuja nada. */
+function DescripcionDeCategoria({ texto }: { texto?: string | null }) {
+  if (!texto) return null
+  return (
+    <p className="font-sans text-body-md text-on-surface-variant leading-relaxed whitespace-pre-line max-w-3xl -mt-3 mb-6">
+      {texto}
+    </p>
+  )
 }
 
 /**
@@ -115,6 +131,7 @@ function CategorySection({
   return (
     <div id={`cat-${node.id}`} className="scroll-mt-[110px]">
       {headingEl}
+      <DescripcionDeCategoria texto={node.descripcionWeb} />
 
       {/* Los combos van ARRIBA de los servicios sueltos, no abajo: son la
           oferta armada de esa clasificación —varios servicios a un precio
@@ -143,7 +160,17 @@ function CategorySection({
   )
 }
 
-export function ServiciosClient({ tree, allServices, trainings, activities, combos, packs, promos, zonas = [] }: Props) {
+export function ServiciosClient({
+  tree,
+  allServices,
+  trainings,
+  activities,
+  combos,
+  packs,
+  promos,
+  zonas = [],
+  descripcionesDeSecciones,
+}: Props) {
   const [query, setQuery] = useState('')
   const [modo, setModo] = useState<ModoCatalogo>('arbol')
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -367,6 +394,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
                 <h2 className="font-serif text-display-lg-mobile text-on-surface border-b border-outline-variant/30 pb-4 mb-8">
                   {AREA_DEPILACION}
                 </h2>
+                <DescripcionDeCategoria texto={descripcionesDeSecciones?.depilacion} />
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {packs.map((p) => (
                     <PackCard key={p.id} pack={p} />
@@ -387,6 +415,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
                 <h2 className="font-serif text-display-lg-mobile text-on-surface border-b border-outline-variant/30 pb-4 mb-8">
                   Actividades
                 </h2>
+                <DescripcionDeCategoria texto={descripcionesDeSecciones?.actividades} />
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {activities.map((a) => (
                     <ActivityCard key={a.id} activity={a} />
@@ -402,6 +431,7 @@ export function ServiciosClient({ tree, allServices, trainings, activities, comb
                 <h2 className="font-serif text-display-lg-mobile text-on-surface border-b border-outline-variant/30 pb-4 mb-8">
                   Capacitaciones
                 </h2>
+                <DescripcionDeCategoria texto={descripcionesDeSecciones?.capacitaciones} />
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {trainings.map((t) => (
                     <TrainingCard key={t.id} training={t} />

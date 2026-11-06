@@ -237,12 +237,12 @@ describe('ServiciosClient — Depilación Definitiva en el menú', () => {
 })
 
 describe('ServiciosClient — zonas de Depilación Definitiva', () => {
-  const zonas = [{ id: 'z1', nombre: 'Axila', precio: 12000 }]
+  const zonas = [{ id: 'z1', nombre: 'Axila', precioMujer: 12000, precioHombre: 14000 }]
 
   it('muestra las zonas en la sección de Depilación Definitiva', () => {
     montar({ zonas })
     expect(screen.getByText('Axila')).toBeInTheDocument()
-    expect(screen.getByText('$12.000')).toBeInTheDocument()
+    expect(screen.getByText('Mujer: $12.000')).toBeInTheDocument()
   })
 
   it('con zonas alcanza para que exista la categoría, aunque no haya packs ni combos', () => {

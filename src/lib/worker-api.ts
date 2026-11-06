@@ -7,6 +7,8 @@ export interface WorkerCategory {
   id: string
   name: string
   description: string | null
+  /** El texto debajo del título en la web. `description` es una nota interna: no se publica. */
+  webDescription?: string | null
   displayOrder: number
   /** Eje al que pertenece (migración 1.37.0): area | tecnica | objetivo | maquina.
    *  Las de eje `area` son las pestañas del dashboard y no van en el sitio. */
@@ -93,8 +95,10 @@ export function mapAvailabilitySlots(availability: WorkerAvailability): TimeSlot
 export async function fetchCategoryTree(
   fetchOptions?: { revalidate?: number },
 ): Promise<WorkerCategory[]> {
+  // 5 minutos y no una hora: lo que Laura escribe en Sitio Web → Textos tiene
+  // que verse pronto, y no hay forma de avisarle a la web que algo cambió.
   return (await workerGet('/api/agenda/categories', {
-    next: { revalidate: fetchOptions?.revalidate ?? 3600 },
+    next: { revalidate: fetchOptions?.revalidate ?? 300 },
   })) as WorkerCategory[]
 }
 
@@ -245,15 +249,16 @@ export async function fetchDepilationPacks(
 export interface WorkerZonaDepilacion {
   id: string
   nombre: string
-  /** El de una zona sola, tarifa de mujer. 0 = sin tarifa cargada. */
-  precio: number
+  /** El de una zona sola. 0 = sin tarifa cargada. */
+  precioMujer: number
+  precioHombre: number
 }
 
 export async function fetchZonasDepilacion(
   fetchOptions?: { revalidate?: number },
 ): Promise<WorkerZonaDepilacion[]> {
   return (await workerGet('/api/agenda/depilacion/zonas-publicas', {
-    next: { revalidate: fetchOptions?.revalidate ?? 1800 },
+    next: { revalidate: fetchOptions?.revalidate ?? 300 },
   })) as WorkerZonaDepilacion[]
 }
 

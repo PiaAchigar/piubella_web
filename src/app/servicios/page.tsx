@@ -17,6 +17,7 @@ import { Activity, Service, Training } from '@/types'
 import { CategoryNode } from '@/components/servicios/types'
 import { ServiciosClient } from '@/components/servicios/servicios-client'
 import { siFalla } from '@/lib/si-falla'
+import { descripcionDeSeccion } from '@/lib/descripcion-de-seccion'
 import { PromosHero } from '@/components/servicios/promos-hero'
 
 // Las categorías de eje `area` (Estética, Medicina y Dermatología, Masajes y
@@ -42,15 +43,15 @@ async function buildNode(cat: WorkerCategory): Promise<CategoryNode> {
   return {
     id: cat.id,
     name: cat.name,
+    descripcionWeb: cat.webDescription ?? null,
     services,
     children: children.filter((c) => c.services.length > 0 || c.children.length > 0),
   }
 }
 
-function getCategoryTree(): Promise<CategoryNode[]> {
+function getCategoryTree(raices: WorkerCategory[]): Promise<CategoryNode[]> {
   return siFalla('el árbol de categorías', async () => {
-    const tree = await fetchCategoryTree()
-    const visibleRoots = tree.filter(esVisibleEnLaWeb)
+    const visibleRoots = raices.filter(esVisibleEnLaWeb)
     const nodes = await Promise.all(visibleRoots.map((c) => buildNode(c)))
     return nodes.filter((n) => n.services.length > 0 || n.children.length > 0)
   }, [])
@@ -73,7 +74,8 @@ function flattenUnique(nodes: CategoryNode[]): Service[] {
 }
 
 export default async function Servicios() {
-  const tree = await getCategoryTree()
+  const raices = await siFalla<WorkerCategory[]>('las categorías', () => fetchCategoryTree(), [])
+  const tree = await getCategoryTree(raices)
   const allServices = flattenUnique(tree)
   const trainings = await siFalla<Training[]>('las capacitaciones', fetchTrainings, [])
   // Actividades (Pilates, Thermobike) viven en su propia tabla, no en `service`;
@@ -97,6 +99,11 @@ export default async function Servicios() {
         packs={packs}
         promos={promos}
         zonas={zonas}
+        descripcionesDeSecciones={{
+          depilacion: descripcionDeSeccion(raices, 'Depilación Definitiva'),
+          actividades: descripcionDeSeccion(raices, 'Actividades'),
+          capacitaciones: descripcionDeSeccion(raices, 'Capacitaciones'),
+        }}
       />
     </>
   )

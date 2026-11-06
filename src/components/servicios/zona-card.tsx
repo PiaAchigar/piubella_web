@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { WorkerZonaDepilacion } from '@/lib/worker-api'
-import { PrecioConAhorro } from './precio-con-ahorro'
+
+const pesos = (n: number) => `$${n.toLocaleString('es-AR')}`
 
 /** Una zona de depilación que se puede hacer suelta, con el precio de una zona sola. */
 export function ZonaCard({ zona }: { zona: WorkerZonaDepilacion }) {
@@ -15,7 +16,10 @@ export function ZonaCard({ zona }: { zona: WorkerZonaDepilacion }) {
       </h3>
 
       <div className="flex items-center justify-between pt-4 border-t border-outline-variant/40 mt-auto">
-        {zona.precio > 0 && <PrecioConAhorro final={zona.precio} claro />}
+        <div className="flex flex-col font-sans text-body-md text-on-surface">
+          {zona.precioMujer > 0 && <span>Mujer: {pesos(zona.precioMujer)}</span>}
+          {zona.precioHombre > 0 && <span>Hombre: {pesos(zona.precioHombre)}</span>}
+        </div>
         <Link
           href="/contacto"
           className="font-sans text-label-md text-primary underline underline-offset-4 ml-auto"
